@@ -1,5 +1,8 @@
 #!/bin/bash
 
+### git remote prune origin
+
+
 # Получить список веток, которых уже нет на внешнем сервере
 missing_branches=$(git branch -vv | grep ': gone]' | awk '{print $1}')
 
