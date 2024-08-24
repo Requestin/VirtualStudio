@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphic Management</title>
+</head>
+<body>
+    <h1>Управление графикой</h1>
+    
+    <form method="POST" enctype="multipart/form-data">
+        <label for="fio">ФИО:</label>
+        <input type="text" name="fio" required>
+        <br>
+
+        <label for="position">Должность:</label>
+        <input type="text" name="position" required>
+        <br>
+
+        <label for="image">Загрузить изображение:</label>
+        <input type="file" name="image" required>
+        <br>
+
+        <button type="submit">Сохранить</button>
+    </form>
+
+    <h2>Текущие данные</h2>
+    <table border="1">
+        <tr>
+            <th>ФИО</th>
+            <th>Должность</th>
+            <th>Путь</th>
+        </tr>
+        <tr>    
+            <td>{{ data['2 окна ФИО'][0] }}</td>
+            <td>{{ data['2 окна ДОЛЖНОСТЬ'][0] }}</td>
+            <td>{{ data['2 окна ПУТЬ'][0] }}</td>
+        </tr>
+    </table>
+</body>
+</html>
