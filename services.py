@@ -2,7 +2,6 @@ import pandas as pd
 import os
 import config
 from PIL import Image
-import cv2
 
 
 def create_excel():
