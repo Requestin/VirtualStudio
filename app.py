@@ -1,42 +1,90 @@
 from flask import Flask, render_template, request, redirect, url_for
 import os
 import pandas as pd
-import services
+import services, config
 
 app = Flask(__name__)
 
-EXCEL_FILE = 'data/data.xlsx'
-UPLOAD_FOLDER  = 'static/uploads'
+excel_file = config.EXCEL_FILE
+upload_folder = config.UPLOAD_FOLDER
 
-
-@app.route('/', methods = ['GET', 'POST'])
+@app.route('/')
 def index():
+    return render_template('index.html')
+
+
+@app.route('/3win_v1', methods=['GET', 'POST'])
+def module_3win_v1():
+    module_name = '3win_v1'
     if request.method == 'POST':
-        fio = request.form['fio']
-        position = request.form['position']
-        file = request.files['image']
+        for i in range(1, 4):
+            fio = request.form[f'fio{i}']
+            position = request.form[f'position{i}']
+            file = request.files[f'photo{i}']
+            # avatar = request.form['image']
 
-        if file:
-            filename = file.filename
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(filepath)
+            if fio and position and file:
+                filename = file.filename
+                filepath = os.path.join(upload_folder, filename)
+                file.save(filepath)
+                proxy_filename = f'{os.path.splitext(filename)[0]}_proxy.png'
+                proxy_filepath = os.path.join(config.PROXY_FOLDER, proxy_filename)
 
-            update_excel(fio, position, filepath)
+                services.convert_for_avatar(filepath, proxy_filepath)
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
 
-        return redirect(url_for('index'))
+# Чтение данных из Excel
+    data = pd.read_excel(config.EXCEL_FILE).to_dict('list')
+    return render_template('3win_v1.html', data=data, module_name=module_name)
 
-    data = pd.read_excel(EXCEL_FILE)
-    return render_template('index.html', data = data)
+@app.route('/3win_v2', methods=['GET', 'POST'])
+def module_3win_v2():
+    module_name = '3win_v2'
+    if request.method == 'POST':
+        for i in range(1, 4):
+            fio = request.form[f'fio{i}']
+            position = request.form[f'position{i}']
+            file = request.files[f'photo{i}']
+            # avatar = request.form['image']
 
+            if fio and position and file:
+                filename = file.filename
+                filepath = os.path.join(upload_folder, filename)
+                file.save(filepath)
+                proxy_filename = f'{os.path.splitext(filename)[0]}_proxy.png'
+                proxy_filepath = os.path.join(config.PROXY_FOLDER, proxy_filename)
 
-def update_excel(fio, position, filepath):
-    df = pd.read_excel(EXCEL_FILE)
+                services.convert_for_avatar(filepath, proxy_filepath)
+                services.update_excel(module_name, fio, position, filepath, i)
 
-    df.at[0, '2 окна ФИО'] = fio
-    df.at[0, '2 окна ДОЛЖНОСТЬ'] = position
-    df.at[0, '2 окна ПУТЬ'] = filepath
+# Чтение данных из Excel
+    data = pd.read_excel(config.EXCEL_FILE).to_dict('list')
+    return render_template('3win_v2.html', data=data, module_name=module_name)
 
-    df.to_excel(EXCEL_FILE, index = False)
+@app.route('/3win_v3', methods=['GET', 'POST'])
+def module_3win_v3():
+    module_name = '3win_v3'
+    if request.method == 'POST':
+        for i in range(1, 4):
+            fio = request.form[f'fio{i}']
+            position = request.form[f'position{i}']
+            file = request.files[f'photo{i}']
+            # avatar = request.form['image']
+
+            if fio and position and file:
+                filename = file.filename
+                filepath = os.path.join(upload_folder, filename)
+                file.save(filepath)
+                proxy_filename = f'{os.path.splitext(filename)[0]}_proxy.png'
+                proxy_filepath = os.path.join(config.PROXY_FOLDER, proxy_filename)
+
+                services.convert_for_avatar(filepath, proxy_filepath)
+                services.update_excel(module_name, fio, position, filepath, i)
+
+# Чтение данных из Excel
+    data = pd.read_excel(config.EXCEL_FILE).to_dict('list')
+    return render_template('3win_v3.html', data=data, module_name=module_name)
+
 
 if __name__ == '__main__':
     services.create_excel()
