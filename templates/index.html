@@ -1,10 +1,15 @@
 <!DOCTYPE html>
+<!-- Указываем язык документа -->
 <html lang="ru">
 <head>
+    <!-- Устанавливаем кодировку документа -->
     <meta charset="UTF-8">
+    <!-- Настраиваем viewport для адаптивного дизайна -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Задаем заголовок страницы -->
     <title>Фото редактор</title>
     <style>
+        /* Стили для body */
         body {
             display: flex;
             flex-direction: column;
@@ -15,11 +20,13 @@
             font-family: Arial, sans-serif;
             background-color: rgb(0, 35, 75);
         }
+        /* Стили для контейнера редактора */
         #editor-container {
             position: relative;
             width: 1920px;
             height: 1080px;
         }
+        /* Стили для контейнера предпросмотра */
         #preview-container {
             position: absolute;
             width: 607px;
@@ -30,6 +37,7 @@
             left: 1005px;
             transform: translate(-50%, -50%);
         }
+        /* Стили для изображения предпросмотра */
         #preview-image {
             position: absolute;
             cursor: move;
@@ -37,9 +45,11 @@
             -webkit-user-drag: none;
             display: none;
         }
+        /* Отображение изображения при наличии src */
         #preview-image[src] {
             display: block;
         }
+        /* Стили для наложения шаблона */
         #template-overlay {
             position: absolute;
             top: 0;
@@ -49,6 +59,7 @@
             pointer-events: none;
             z-index: 10;
         }
+        /* Стили для контейнера текстовых полей */
         #text-inputs-container {
             position: absolute;
             top: 940px;
@@ -59,12 +70,14 @@
             gap: 20px;
             transform: translateX(-50%);
         }
+        /* Стили для контейнера кнопок */
         #button-container {
             display: flex;
             justify-content: center;
             gap: 20px;
             margin-top: 20px;
         }
+        /* Общие стили для кнопок и текстовых полей */
         #upload-btn, #save-btn, .text-input {
             padding: 12px 24px;
             font-size: 24px;
@@ -76,26 +89,32 @@
             transition: all 0.3s ease;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
+        /* Стили при наведении на кнопки и фокусе на текстовых полях */
         #upload-btn:hover, #save-btn:hover, .text-input:focus {
             background-color: rgb(0, 25, 55);
         }
+        /* Стили при нажатии на кнопки */
         #upload-btn:active, #save-btn:active {
             background-color: rgb(0, 15, 35);
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
             transform: translateY(1px);
         }
+        /* Стили для неактивной кнопки сохранения */
         #save-btn:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
         }
+        /* Стили для текстовых полей */
         .text-input {
             width: 800px;
             margin: 0;
             cursor: text;
         }
+        /* Стили для плейсхолдера в текстовых полях */
         .text-input::placeholder {
             color: rgba(255, 255, 255, 0.7);
         }
+        /* Стили для оверлея загрузки */
         #loading-overlay {
             display: none;
             position: fixed;
@@ -108,6 +127,7 @@
             justify-content: center;
             align-items: center;
         }
+        /* Стили для спиннера загрузки */
         .spinner {
             width: 50px;
             height: 50px;
@@ -116,6 +136,7 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
+        /* Анимация вращения для спиннера */
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -123,25 +144,39 @@
     </style>
 </head>
 <body>
+    <!-- Контейнер редактора -->
     <div id="editor-container">
+        <!-- Контейнер предпросмотра -->
         <div id="preview-container">
+            <!-- Изображение предпросмотра -->
             <img id="preview-image" src="">
         </div>
+        <!-- Наложение шаблона -->
         <img id="template-overlay" src="/static/background.png" alt="Шаблон">
+        <!-- Контейнер текстовых полей -->
         <div id="text-inputs-container">
+            <!-- Поле для ввода ФИО -->
             <input type="text" class="text-input" placeholder="Введите ФИО">
+            <!-- Поле для ввода должности -->
             <input type="text" class="text-input" placeholder="Введите должность">
         </div>
     </div>
+    <!-- Контейнер кнопок -->
     <div id="button-container">
+        <!-- Скрытое поле для загрузки файла -->
         <input type="file" id="file-input" accept="image/*" style="display: none;">
+        <!-- Кнопка загрузки фото -->
         <button id="upload-btn">Загрузить фото</button>
+        <!-- Кнопка сохранения фото -->
         <button id="save-btn" disabled>Сохранить фото</button>
     </div>
+    <!-- Оверлей загрузки -->
     <div id="loading-overlay">
+        <!-- Спиннер загрузки -->
         <div class="spinner"></div>
     </div>
     <script>
+        // Получаем ссылки на элементы DOM
         const previewContainer = document.getElementById('preview-container');
         const previewImage = document.getElementById('preview-image');
         const fileInput = document.getElementById('file-input');
@@ -150,6 +185,7 @@
         const nameInput = document.querySelector('.text-input[placeholder="Введите ФИО"]');
         const positionInput = document.querySelector('.text-input[placeholder="Введите должность"]');
 
+        // Инициализация переменных
         let isDragging = false;
         let startX, startY;
         let scale = 1;
@@ -158,8 +194,10 @@
         let isImageLoaded = false;
         let isSaving = false;
 
+        // Обработчик клика по кнопке загрузки
         uploadBtn.addEventListener('click', () => fileInput.click());
 
+        // Функция проверки валидности формы
         function checkFormValidity() {
             const isNameFilled = nameInput.value.trim() !== '';
             const isPositionFilled = positionInput.value.trim() !== '';
@@ -171,6 +209,7 @@
             }
         }
 
+        // Обработчик изменения файла
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -179,9 +218,11 @@
             }
         });
 
+        // Обработчики ввода текста
         nameInput.addEventListener('input', checkFormValidity);
         positionInput.addEventListener('input', checkFormValidity);
 
+        // Функция загрузки изображения
         function loadImage(file) {
             currentImageFile = file;
             const reader = new FileReader();
@@ -196,6 +237,7 @@
             reader.readAsDataURL(file);
         }
 
+        // Функция центрирования и масштабирования изображения
         function centerAndScaleImage() {
             const containerWidth = previewContainer.offsetWidth;
             const containerHeight = previewContainer.offsetHeight;
@@ -223,14 +265,17 @@
             previewImage.style.top = `${top}px`;
         }
 
+        // Обработчики событий для перетаскивания и масштабирования
         previewContainer.addEventListener('mousedown', startDragging);
         document.addEventListener('mousemove', drag);
         document.addEventListener('mouseup', stopDragging);
         previewContainer.addEventListener('wheel', handleWheel);
         previewContainer.addEventListener('auxclick', handleMiddleClick);
 
+        // Предотвращение стандартного перетаскивания изображения
         previewImage.addEventListener('dragstart', (e) => e.preventDefault());
 
+        // Функция начала перетаскивания
         function startDragging(e) {
             if (e.button === 0 && isImageLoaded) {
                 isDragging = true;
@@ -240,6 +285,7 @@
             }
         }
 
+        // Функция перетаскивания
         function drag(e) {
             if (isDragging && isImageLoaded) {
                 e.preventDefault();
@@ -250,10 +296,12 @@
             }
         }
 
+        // Функция окончания перетаскивания
         function stopDragging() {
             isDragging = false;
         }
 
+        // Функция обработки колесика мыши (масштабирование)
         function handleWheel(e) {
             if (isImageLoaded) {
                 e.preventDefault();
@@ -274,6 +322,7 @@
             }
         }
 
+        // Функция обработки клика средней кнопкой мыши (сброс масштаба)
         function handleMiddleClick(e) {
             if (e.button === 1 && currentImageFile) {
                 e.preventDefault();
@@ -281,14 +330,17 @@
             }
         }
 
+        // Функция отображения оверлея загрузки
         function showLoadingOverlay() {
             document.getElementById('loading-overlay').style.display = 'flex';
         }
         
+        // Функция скрытия оверлея загрузки
         function hideLoadingOverlay() {
             document.getElementById('loading-overlay').style.display = 'none';
         }
 
+        // Обработчик события перед закрытием страницы
         window.addEventListener('beforeunload', function (e) {
             if (isSaving) {
                 e.preventDefault();
@@ -297,6 +349,7 @@
             }
         });
 
+        // Обработчик клика по кнопке сохранения
         saveBtn.addEventListener('click', (e) => {
             if (saveBtn.disabled) {
                 e.preventDefault();
@@ -307,14 +360,17 @@
             isSaving = true;
             showLoadingOverlay();
             
+            // Создание canvas для обработки изображения
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = 607;
             canvas.height = 749;
 
+            // Получение координат и размеров изображения
             const rect = previewImage.getBoundingClientRect();
             const containerRect = previewContainer.getBoundingClientRect();
 
+            // Отрисовка обрезанного изображения на canvas
             ctx.drawImage(
                 previewImage,
                 (containerRect.left - rect.left) / scale,
@@ -324,11 +380,14 @@
                 0, 0, 607, 749
             );
 
+            // Получение данных изображения в формате base64
             const imageData = canvas.toDataURL('image/png');
 
+            // Получение введенных данных
             const name = nameInput.value;
             const position = positionInput.value;
 
+            // Отправка данных на сервер
             fetch('/save_image', {
                 method: 'POST',
                 headers: {
