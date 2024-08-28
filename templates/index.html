@@ -1,391 +1,398 @@
-<!DOCTYPE html> <!-- Объявление типа документа HTML5 -->
-<html lang="ru"> <!-- Начало HTML-документа с указанием языка (русский) -->
-<head> <!-- Начало секции заголовка документа -->
-    <meta charset="UTF-8"> <!-- Установка кодировки документа в UTF-8 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Настройка viewport для адаптивного дизайна -->
-    <title>Фото редактор</title> <!-- Заголовок страницы, отображаемый во вкладке браузера -->
-    <style> /* Начало секции встроенных стилей CSS */
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фото редактор</title>
+    <style>
         body {
-            display: flex; /* Использование flexbox для выравнивания содержимого */
-            flex-direction: column; /* Расположение элементов в колонку */
-            align-items: center; /* Центрирование элементов по горизонтали */
-            justify-content: center; /* Центрирование элементов по вертикали */
-            height: 100vh; /* Высота body равна высоте viewport */
-            margin: 0; /* Убираем внешние отступы */
-            font-family: Arial, sans-serif; /* Установка шрифта */
-            background-color: rgb(0, 35, 75); /* Цвет фона страницы */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgb(0, 35, 75);
         }
         #editor-container {
-            position: relative; /* Позиционирование относительно своего нормального положения */
-            width: 1920px; /* Ширина контейнера редактора */
-            height: 1080px; /* Высота контейнера редактора */
+            position: relative;
+            width: 1920px;
+            height: 1080px;
         }
         #preview-container {
-            position: absolute; /* Абсолютное позиционирование */
-            width: 607px; /* Ширина контейнера предпросмотра */
-            height: 749px; /* Высота контейнера предпросмотра */
-            border: 3px solid #ff0000; /* Красная рамка вокруг контейнера предпросмотра */
-            overflow: hidden; /* Скрытие содержимого, выходящего за пределы контейнера */
-            top: 412px; /* Отступ сверху */
-            left: 1005px; /* Отступ слева */
-            transform: translate(-50%, -50%); /* Центрирование контейнера */
+            position: absolute;
+            width: 607px;
+            height: 749px;
+            border: 3px solid #ff0000;
+            overflow: hidden;
+            top: 412px;
+            left: 1005px;
+            transform: translate(-50%, -50%);
         }
         #preview-image {
-            position: absolute; /* Абсолютное позиционирование */
-            cursor: move; /* Курсор в виде "руки" при наведении */
-            user-select: none; /* Запрет выделения изображения */
-            -webkit-user-drag: none; /* Запрет перетаскивания изображения (для WebKit) */
-            display: none; /* Изначально скрыто */
+            position: absolute;
+            cursor: move;
+            user-select: none;
+            -webkit-user-drag: none;
+            display: none;
         }
         #preview-image[src] {
-            display: block; /* Показывать, когда есть источник изображения */
+            display: block;
         }
         #template-overlay {
-            position: absolute; /* Абсолютное позиционирование */
-            top: 0; /* Прижать к верху */
-            left: 0; /* Прижать к левому краю */
-            width: 100%; /* Ширина на весь контейнер */
-            height: 100%; /* Высота на весь контейнер */
-            pointer-events: none; /* Игнорирование событий мыши */
-            z-index: 10; /* Поверх других элементов */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
         }
         .input-container, .button-container {
-            position: absolute; /* Абсолютное позиционирование */
-            z-index: 30; /* Поверх других элементов */
+            position: absolute;
+            z-index: 30;
         }
         #name-input-container {
-            top: 940px; /* Отступ сверху */
-            left: calc(50% - 100px); /* Позиционирование по центру с учетом ширины */
-            transform: translateX(-50%); /* Дополнительное центрирование */
+            top: 940px;
+            left: calc(50% - 100px);
+            transform: translateX(-50%);
         }
         #position-input-container {
-            top: 1004px; /* Отступ сверху */
-            left: calc(50% - 100px); /* Позиционирование по центру с учетом ширины */
-            transform: translateX(-50%); /* Дополнительное центрирование */
+            top: 1004px;
+            left: calc(50% - 100px);
+            transform: translateX(-50%);
         }
         #upload-btn-container {
-            top: 940px; /* Отступ сверху */
-            right: calc(50% - 550px); /* Позиционирование справа */
+            top: 940px;
+            right: calc(50% - 550px);
         }
         #save-btn-container {
-            top: 1004px; /* Отступ сверху */
-            right: calc(50% - 550px); /* Позиционирование справа */
+            top: 1004px;
+            right: calc(50% - 550px);
         }
         .text-input {
-            width: 800px; /* Ширина текстового поля */
-            padding: 12px 24px; /* Внутренние отступы */
-            font-size: 24px; /* Размер шрифта */
-            background-color: rgb(0, 75, 50); /* Цвет фона */
-            color: white; /* Цвет текста */
-            border: none; /* Убираем границу */
-            border-radius: 5px; /* Скругление углов */
-            transition: all 0.3s ease; /* Плавное изменение стилей */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Тень */
+            width: 800px;
+            padding: 12px 24px;
+            font-size: 24px;
+            background-color: rgb(0, 75, 50);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         .text-input:focus {
-            background-color: rgb(0, 25, 55); /* Цвет фона при фокусе */
+            background-color: rgb(0, 25, 55);
         }
         .text-input::placeholder {
-            color: rgba(255, 255, 255, 0.7); /* Цвет плейсхолдера */
+            color: rgba(255, 255, 255, 0.7);
         }
         .action-btn {
-            width: 200px;  /* Фиксированная ширина */
-            height: 50px;  /* Фиксированная высота */
-            padding: 0 12px;  /* Отступы по горизонтали */
-            font-size: 21px;  /* Уменьшенный размер шрифта */
-            cursor: pointer; /* Курсор в виде указателя */
-            background-color: rgb(0, 75, 50); /* Цвет фона */
-            color: white; /* Цвет текста */
-            border: none; /* Убираем границу */
-            border-radius: 5px; /* Скругление углов */
-            transition: all 0.3s ease; /* Плавное изменение стилей */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Тень */
-            white-space: nowrap;  /* Предотвращение переноса текста */
-            overflow: hidden;  /* Скрытие текста, если он не помещается */
-            text-overflow: ellipsis;  /* Добавление многоточия, если текст не помещается */
-            display: flex;  /* Использование flexbox для центрирования */
-            justify-content: center;  /* Горизонтальное центрирование */
-            align-items: center;  /* Вертикальное центрирование */
+            width: 200px;
+            height: 50px;
+            padding: 0 12px;
+            font-size: 21px;
+            cursor: pointer;
+            background-color: rgb(0, 75, 50);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .action-btn:hover {
-            background-color: rgb(0, 25, 55); /* Цвет фона при наведении */
+            background-color: rgb(0, 25, 55);
         }
         .action-btn:active {
-            background-color: rgb(0, 15, 35); /* Цвет фона при нажатии */
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Уменьшение тени при нажатии */
-            transform: translateY(1px); /* Небольшое смещение вниз при нажатии */
+            background-color: rgb(0, 15, 35);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            transform: translateY(1px);
         }
         #save-btn:disabled {
-            background-color: #cccccc; /* Цвет фона для неактивной кнопки */
-            cursor: not-allowed; /* Курсор, показывающий, что действие недоступно */
+            background-color: #cccccc;
+            cursor: not-allowed;
         }
         #loading-overlay {
-            display: none; /* Изначально скрыто */
-            position: fixed; /* Фиксированное позиционирование */
-            top: 0; /* Прижать к верху */
-            left: 0; /* Прижать к левому краю */
-            width: 100%; /* Ширина на весь экран */
-            height: 100%; /* Высота на весь экран */
-            background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный черный фон */
-            z-index: 1000; /* Поверх всех элементов */
-            justify-content: center; /* Центрирование по горизонтали */
-            align-items: center; /* Центрирование по вертикали */
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
         .spinner {
-            width: 50px; /* Ширина спиннера */
-            height: 50px; /* Высота спиннера */
-            border: 5px solid #f3f3f3; /* Граница спиннера */
-            border-top: 5px solid #3498db; /* Верхняя граница спиннера */
-            border-radius: 50%; /* Круглая форма */
-            animation: spin 1s linear infinite; /* Анимация вращения */
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
         @keyframes spin {
-            0% { transform: rotate(0deg); } /* Начальное положение */
-            100% { transform: rotate(360deg); } /* Конечное положение (полный оборот) */
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body> <!-- Начало тела документа -->
-    <div id="editor-container"> <!-- Контейнер редактора -->
-        <div id="preview-container"> <!-- Контейнер предпросмотра -->
-            <img id="preview-image" src=""> <!-- Изображение для предпросмотра -->
+<body>
+    <div id="editor-container">
+        <div id="preview-container">
+            <img id="preview-image" src="">
         </div>
-        <img id="template-overlay" src="/static/background.png" alt="Шаблон"> <!-- Наложение шаблона -->
+        <img id="template-overlay" src="/static/background.png" alt="Шаблон">
         
-        <div id="name-input-container" class="input-container"> <!-- Контейнер для ввода имени -->
-            <input type="text" id="name-input" class="text-input" placeholder="Введите ФИО"> <!-- Поле ввода ФИО -->
-        </div>
-        
-        <div id="position-input-container" class="input-container"> <!-- Контейнер для ввода должности -->
-            <input type="text" id="position-input" class="text-input" placeholder="Введите должность"> <!-- Поле ввода должности -->
+        <div id="name-input-container" class="input-container">
+            <input type="text" id="name-input" class="text-input" placeholder="Введите ФИО">
         </div>
         
-        <div id="upload-btn-container" class="button-container"> <!-- Контейнер для кнопки загрузки -->
-            <input type="file" id="file-input" accept="image/*" style="display: none;"> <!-- Скрытое поле выбора файла -->
-            <button id="upload-btn" class="action-btn">Загрузить фото</button> <!-- Кнопка загрузки фото -->
+        <div id="position-input-container" class="input-container">
+            <input type="text" id="position-input" class="text-input" placeholder="Введите должность">
         </div>
         
-        <div id="save-btn-container" class="button-container"> <!-- Контейнер для кнопки сохранения -->
-            <button id="save-btn" class="action-btn" disabled>Сохранить фото</button> <!-- Кнопка сохранения фото -->
+        <div id="upload-btn-container" class="button-container">
+            <input type="file" id="file-input" accept="image/*" style="display: none;">
+            <button id="upload-btn" class="action-btn">Загрузить фото</button>
+        </div>
+        
+        <div id="save-btn-container" class="button-container">
+            <button id="save-btn" class="action-btn" disabled>Сохранить фото</button>
         </div>
     </div>
-    <div id="loading-overlay"> <!-- Оверлей загрузки -->
-        <div class="spinner"></div> <!-- Спиннер (индикатор загрузки) -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
     </div>
-    <script> <!-- Начало секции JavaScript -->
-        const previewContainer = document.getElementById('preview-container'); // Получение контейнера предпросмотра
-        const previewImage = document.getElementById('preview-image'); // Получение изображения предпросмотра
-        const fileInput = document.getElementById('file-input'); // Получение поля выбора файла
-        const uploadBtn = document.getElementById('upload-btn'); // Получение кнопки загрузки
-        const saveBtn = document.getElementById('save-btn'); // Получение кнопки сохранения
-        const nameInput = document.getElementById('name-input'); // Получение поля ввода имени
-        const positionInput = document.getElementById('position-input'); // Получение поля ввода должности
+    <script>
+        const previewContainer = document.getElementById('preview-container');
+        const previewImage = document.getElementById('preview-image');
+        const fileInput = document.getElementById('file-input');
+        const uploadBtn = document.getElementById('upload-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const nameInput = document.getElementById('name-input');
+        const positionInput = document.getElementById('position-input');
 
-        let isDragging = false; // Флаг перетаскивания
-        let startX, startY; // Начальные координаты при перетаскивании
-        let scale = 1; // Масштаб изображения
-        let currentImageFile = null; // Текущий файл изображения
-        let currentImageName = ''; // Имя текущего изображения
-        let isImageLoaded = false; // Флаг загрузки изображения
-        let isSaving = false; // Флаг процесса сохранения
+        let isDragging = false;
+        let startX, startY;
+        let scale = 1;
+        let currentImageFile = null;
+        let currentImageName = '';
+        let isImageLoaded = false;
+        let isSaving = false;
 
-        uploadBtn.addEventListener('click', () => fileInput.click()); // Обработчик клика на кнопку загрузки
+        uploadBtn.addEventListener('click', function() {
+            console.log('Кнопка загрузки нажата');
+            fileInput.click();
+        });
 
-        function checkFormValidity() { // Функция проверки валидности формы
+        function checkFormValidity() {
             const isNameFilled = nameInput.value.trim() !== '';
             const isPositionFilled = positionInput.value.trim() !== '';
 
             if (isImageLoaded && isNameFilled && isPositionFilled) {
-                saveBtn.disabled = false; // Активация кнопки сохранения
+                saveBtn.disabled = false;
             } else {
-                saveBtn.disabled = true; // Деактивация кнопки сохранения
+                saveBtn.disabled = true;
             }
         }
-        fileInput.addEventListener('change', (e) => { // Добавляем обработчик события изменения файла
-    const file = e.target.files[0]; // Получаем первый выбранный файл
-    if (file) { // Если файл выбран
-        currentImageName = file.name; // Сохраняем имя файла
-        loadImage(file); // Загружаем изображение
-    }
-});
 
-nameInput.addEventListener('input', checkFormValidity); // Добавляем обработчик ввода для поля имени
-positionInput.addEventListener('input', checkFormValidity); // Добавляем обработчик ввода для поля должности
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                currentImageName = file.name;
+                loadImage(file);
+            }
+        });
 
-function loadImage(file) { // Функция загрузки изображения
-    currentImageFile = file; // Сохраняем текущий файл
-    const reader = new FileReader(); // Создаем объект FileReader для чтения файла
-    reader.onload = (e) => { // Обработчик завершения чтения файла
-        previewImage.src = e.target.result; // Устанавливаем источник изображения
-        previewImage.onload = () => { // Обработчик загрузки изображения
-            centerAndScaleImage(); // Центрируем и масштабируем изображение
-            isImageLoaded = true; // Устанавливаем флаг загрузки изображения
-            checkFormValidity(); // Проверяем валидность формы
-        };
-    };
-    reader.readAsDataURL(file); // Читаем файл как URL данных
-}
+        nameInput.addEventListener('input', checkFormValidity);
+        positionInput.addEventListener('input', checkFormValidity);
 
-function centerAndScaleImage() { // Функция центрирования и масштабирования изображения
-    const containerWidth = previewContainer.offsetWidth; // Получаем ширину контейнера
-    const containerHeight = previewContainer.offsetHeight; // Получаем высоту контейнера
-    const imageWidth = previewImage.naturalWidth; // Получаем естественную ширину изображения
-    const imageHeight = previewImage.naturalHeight; // Получаем естественную высоту изображения
-
-    const containerAspectRatio = containerWidth / containerHeight; // Вычисляем соотношение сторон контейнера
-    const imageAspectRatio = imageWidth / imageHeight; // Вычисляем соотношение сторон изображения
-
-    if (containerAspectRatio > imageAspectRatio) { // Если контейнер шире
-        scale = containerHeight / imageHeight; // Масштабируем по высоте
-    } else {
-        scale = containerWidth / imageWidth; // Иначе масштабируем по ширине
-    }
-
-    const scaledWidth = imageWidth * scale; // Вычисляем масштабированную ширину
-    const scaledHeight = imageHeight * scale; // Вычисляем масштабированную высоту
-
-    const left = (containerWidth - scaledWidth) / 2; // Вычисляем отступ слева для центрирования
-    const top = (containerHeight - scaledHeight) / 2; // Вычисляем отступ сверху для центрирования
-
-    previewImage.style.width = `${scaledWidth}px`; // Устанавливаем ширину изображения
-    previewImage.style.height = `${scaledHeight}px`; // Устанавливаем высоту изображения
-    previewImage.style.left = `${left}px`; // Устанавливаем отступ слева
-    previewImage.style.top = `${top}px`; // Устанавливаем отступ сверху
-}
-
-previewContainer.addEventListener('mousedown', startDragging); // Добавляем обработчик нажатия мыши
-document.addEventListener('mousemove', drag); // Добавляем обработчик движения мыши
-document.addEventListener('mouseup', stopDragging); // Добавляем обработчик отпускания кнопки мыши
-previewContainer.addEventListener('wheel', handleWheel); // Добавляем обработчик прокрутки колесика мыши
-previewContainer.addEventListener('auxclick', handleMiddleClick); // Добавляем обработчик клика средней кнопкой мыши
-
-previewImage.addEventListener('dragstart', (e) => e.preventDefault()); // Предотвращаем стандартное перетаскивание изображения
-
-function startDragging(e) { // Функция начала перетаскивания
-    if (e.button === 0 && isImageLoaded) { // Если нажата левая кнопка мыши и изображение загружено
-        isDragging = true; // Устанавливаем флаг перетаскивания
-        startX = e.clientX - previewImage.offsetLeft; // Запоминаем начальную позицию по X
-        startY = e.clientY - previewImage.offsetTop; // Запоминаем начальную позицию по Y
-        e.preventDefault(); // Предотвращаем стандартное поведение
-    }
-}
-
-function drag(e) { // Функция перетаскивания
-    if (isDragging && isImageLoaded) { // Если идет перетаскивание и изображение загружено
-        e.preventDefault(); // Предотвращаем стандартное поведение
-        const x = e.clientX - startX; // Вычисляем новую позицию по X
-        const y = e.clientY - startY; // Вычисляем новую позицию по Y
-        previewImage.style.left = `${x}px`; // Устанавливаем новую позицию по X
-        previewImage.style.top = `${y}px`; // Устанавливаем новую позицию по Y
-    }
-}
-
-function stopDragging() { // Функция окончания перетаскивания
-    isDragging = false; // Сбрасываем флаг перетаскивания
-}
-
-function handleWheel(e) { // Функция обработки прокрутки колесика мыши
-    if (isImageLoaded) { // Если изображение загружено
-        e.preventDefault(); // Предотвращаем стандартное поведение
-        const delta = e.deltaY > 0 ? 0.95 : 1.05; // Определяем направление прокрутки
-        scale *= delta; // Изменяем масштаб
-        scale = Math.max(0.1, Math.min(scale, 5)); // Ограничиваем масштаб
-
-        const newWidth = previewImage.naturalWidth * scale; // Вычисляем новую ширину
-        const newHeight = previewImage.naturalHeight * scale; // Вычисляем новую высоту
-
-        const left = parseFloat(previewImage.style.left) + (previewImage.offsetWidth - newWidth) / 2; // Вычисляем новую позицию по X
-        const top = parseFloat(previewImage.style.top) + (previewImage.offsetHeight - newHeight) / 2; // Вычисляем новую позицию по Y
-
-        previewImage.style.width = `${newWidth}px`; // Устанавливаем новую ширину
-        previewImage.style.height = `${newHeight}px`; // Устанавливаем новую высоту
-        previewImage.style.left = `${left}px`; // Устанавливаем новую позицию по X
-        previewImage.style.top = `${top}px`; // Устанавливаем новую позицию по Y
-    }
-}
-
-function handleMiddleClick(e) { // Функция обработки клика средней кнопкой мыши
-    if (e.button === 1 && currentImageFile) { // Если нажата средняя кнопка и есть текущий файл
-        e.preventDefault(); // Предотвращаем стандартное поведение
-        loadImage(currentImageFile); // Перезагружаем изображение
-    }
-}
-
-function showLoadingOverlay() { // Функция отображения оверлея загрузки
-    document.getElementById('loading-overlay').style.display = 'flex'; // Показываем оверлей
-}
-
-function hideLoadingOverlay() { // Функция скрытия оверлея загрузки
-    document.getElementById('loading-overlay').style.display = 'none'; // Скрываем оверлей
-}
-
-window.addEventListener('beforeunload', function (e) { // Добавляем обработчик события перед выгрузкой страницы
-    if (isSaving) { // Если идет сохранение
-        e.preventDefault(); // Предотвращаем закрытие страницы
-        e.returnValue = ''; // Устанавливаем сообщение для браузера
-        return ''; // Возвращаем пустую строку
-    }
-});
-
-saveBtn.addEventListener('click', (e) => { // Добавляем обработчик клика на кнопку сохранения
-    if (saveBtn.disabled) { // Если кнопка неактивна
-        e.preventDefault(); // Предотвращаем действие по умолчанию
-        alert("Проверьте правильность введенных вами данных!"); // Показываем предупреждение
-        return; // Прерываем выполнение функции
-    }
-
-    isSaving = true; // Устанавливаем флаг сохранения
-    showLoadingOverlay(); // Показываем оверлей загрузки
-    
-    const canvas = document.createElement('canvas'); // Создаем элемент canvas
-    const ctx = canvas.getContext('2d'); // Получаем контекст рисования
-    canvas.width = 607; // Устанавливаем ширину canvas
-    canvas.height = 749; // Устанавливаем высоту canvas
-
-    const rect = previewImage.getBoundingClientRect(); // Получаем размеры и позицию изображения
-    const containerRect = previewContainer.getBoundingClientRect(); // Получаем размеры и позицию контейнера
-
-    ctx.drawImage( // Рисуем изображение на canvas
-        previewImage,
-        (containerRect.left - rect.left) / scale,
-        (containerRect.top - rect.top) / scale,
-        containerRect.width / scale,
-        containerRect.height / scale,
-        0, 0, 607, 749
-    );
-
-    const imageData = canvas.toDataURL('image/png'); // Получаем данные изображения в формате base64
-
-    const name = nameInput.value; // Получаем введенное имя
-    const position = positionInput.value; // Получаем введенную должность
-
-    fetch('/save_image', { // Отправляем запрос на сервер
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            image: imageData,
-            name: name,
-            position: position
-        })
-    })
-    .then(response => response.json()) // Обрабатываем ответ сервера
-    .then(data => {
-        hideLoadingOverlay(); // Скрываем оверлей загрузки
-        isSaving = false; // Сбрасываем флаг сохранения
-        if (data.success) { // Если сохранение успешно
-            alert('Изображение успешно обработано и сохранено: ' + data.file_path); // Показываем сообщение об успехе
-        } else {
-            alert('Ошибка при обработке изображения: ' + data.error); // Показываем сообщение об ошибке
+        function loadImage(file) {
+            currentImageFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewImage.onload = () => {
+                    centerAndScaleImage();
+                    isImageLoaded = true;
+                    checkFormValidity();
+                };
+            };
+            reader.readAsDataURL(file);
         }
-    })
-    .catch(error => { // Обрабатываем ошибки
-        hideLoadingOverlay(); // Скрываем оверлей загрузки
-        isSaving = false; // Сбрасываем флаг сохранения
-        console.error('Ошибка:', error); // Выводим ошибку в консоль
-        alert('Произошла ошибка при сохранении изображения'); // Показываем сообщение об ошибке
-    });
-});
 
-checkFormValidity(); // Проверяем валидность формы при загрузке страницы
+        function centerAndScaleImage() {
+            const containerWidth = previewContainer.offsetWidth;
+            const containerHeight = previewContainer.offsetHeight;
+            const imageWidth = previewImage.naturalWidth;
+            const imageHeight = previewImage.naturalHeight;
+
+            const containerAspectRatio = containerWidth / containerHeight;
+            const imageAspectRatio = imageWidth / imageHeight;
+
+            if (containerAspectRatio > imageAspectRatio) {
+                scale = containerHeight / imageHeight;
+            } else {
+                scale = containerWidth / imageWidth;
+            }
+
+            const scaledWidth = imageWidth * scale;
+            const scaledHeight = imageHeight * scale;
+
+            const left = (containerWidth - scaledWidth) / 2;
+            const top = (containerHeight - scaledHeight) / 2;
+
+            previewImage.style.width = `${scaledWidth}px`;
+            previewImage.style.height = `${scaledHeight}px`;
+            previewImage.style.left = `${left}px`;
+            previewImage.style.top = `${top}px`;
+        }
+
+        previewContainer.addEventListener('mousedown', startDragging);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', stopDragging);
+        previewContainer.addEventListener('wheel', handleWheel);
+        previewContainer.addEventListener('auxclick', handleMiddleClick);
+
+        previewImage.addEventListener('dragstart', (e) => e.preventDefault());
+
+        function startDragging(e) {
+            if (e.button === 0 && isImageLoaded) {
+                isDragging = true;
+                startX = e.clientX - previewImage.offsetLeft;
+                startY = e.clientY - previewImage.offsetTop;
+                e.preventDefault();
+            }
+        }
+
+        function drag(e) {
+            if (isDragging && isImageLoaded) {
+                e.preventDefault();
+                const x = e.clientX - startX;
+                const y = e.clientY - startY;
+                previewImage.style.left = `${x}px`;
+                previewImage.style.top = `${y}px`;
+            }
+        }
+
+        function stopDragging() {
+            isDragging = false;
+        }
+
+        function handleWheel(e) {
+            if (isImageLoaded) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 0.95 : 1.05;
+                scale *= delta;
+                scale = Math.max(0.1, Math.min(scale, 5));
+
+                const newWidth = previewImage.naturalWidth * scale;
+                const newHeight = previewImage.naturalHeight * scale;
+
+                const left = parseFloat(previewImage.style.left) + (previewImage.offsetWidth - newWidth) / 2;
+                const top = parseFloat(previewImage.style.top) + (previewImage.offsetHeight - newHeight) / 2;
+
+                previewImage.style.width = `${newWidth}px`;
+                previewImage.style.height = `${newHeight}px`;
+                previewImage.style.left = `${left}px`;
+                previewImage.style.top = `${top}px`;
+            }
+        }
+
+        function handleMiddleClick(e) {
+            if (e.button === 1 && currentImageFile) {
+                e.preventDefault();
+                loadImage(currentImageFile);
+            }
+        }
+
+        function showLoadingOverlay() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+        
+        function hideLoadingOverlay() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        window.addEventListener('beforeunload', function (e) {
+            if (isSaving) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        });
+
+        saveBtn.addEventListener('click', (e) => {
+            if (saveBtn.disabled) {
+                e.preventDefault();
+                alert("Проверьте правильность введенных вами данных!");
+                return;
+            }
+
+            isSaving = true;
+            showLoadingOverlay();
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 607;
+            canvas.height = 749;
+
+            const rect = previewImage.getBoundingClientRect();
+            const containerRect = previewContainer.getBoundingClientRect();
+
+            ctx.drawImage(
+                previewImage,
+                (containerRect.left - rect.left) / scale,
+                (containerRect.top - rect.top) / scale,
+                containerRect.width / scale,
+                containerRect.height / scale,
+                0, 0, 607, 749
+            );
+
+            const imageData = canvas.toDataURL('image/png');
+
+            const name = nameInput.value;
+            const position = positionInput.value;
+
+            fetch('/save_image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    image: imageData,
+                    name: name,
+                    position: position
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideLoadingOverlay();
+                isSaving = false;
+                if (data.success) {
+                    alert('Изображение успешно обработано и сохранено: ' + data.file_path);
+                } else {
+                    alert('Ошибка при обработке изображения: ' + data.error);
+                }
+            })
+            .catch(error => {
+                hideLoadingOverlay();
+                isSaving = false;
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при сохранении изображения');
+            });
+        });
+
+        checkFormValidity();
+    </script>
+</body>
+</html>
