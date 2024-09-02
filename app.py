@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import os
 import pandas as pd
 import services, config
 import database as db
+import sqlite3
 
 app = Flask(__name__)
 
@@ -42,22 +43,15 @@ def module_3win_v1():
         for i in range(1, 4):
             fio = request.form[f'fio{i}']
             position = request.form[f'position{i}']
-            file = request.files[f'photo{i}']
-            # avatar = request.form['image']
+            filepath = request.form[f'photo_path{i}']
+            proxy_filepath = request.form[f'proxy_path{i}']
 
-            if fio and position and file:
-                filename = file.filename
-                filepath = os.path.join(upload_folder, filename)
-                file.save(filepath)
-                proxy_filename = f'{os.path.splitext(filename)[0]}_proxy.png'
-                proxy_filepath = os.path.join(config.PROXY_FOLDER, proxy_filename)
-
-                services.convert_for_avatar(filepath, proxy_filepath)
+            if fio and position and filepath and proxy_filepath:
                 services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
-
-# Чтение данных из Excel
+    # Чтение данных из Excel
     data = pd.read_excel(config.EXCEL_FILE).to_dict('list')
     return render_template('3win_v1.html', data=data, module_name=module_name)
+
 
 @app.route('/3win_v2', methods=['GET', 'POST'])
 def module_3win_v2():
@@ -66,22 +60,15 @@ def module_3win_v2():
         for i in range(1, 4):
             fio = request.form[f'fio{i}']
             position = request.form[f'position{i}']
-            file = request.files[f'photo{i}']
-            # avatar = request.form['image']
+            filepath = request.form[f'photo_path{i}']
+            proxy_filepath = request.form[f'proxy_path{i}']
 
-            if fio and position and file:
-                filename = file.filename
-                filepath = os.path.join(upload_folder, filename)
-                file.save(filepath)
-                proxy_filename = f'{os.path.splitext(filename)[0]}_proxy.png'
-                proxy_filepath = os.path.join(config.PROXY_FOLDER, proxy_filename)
-
-                services.convert_for_avatar(filepath, proxy_filepath)
-                services.update_excel(module_name, fio, position, filepath, i)
-
-# Чтение данных из Excel
+            if fio and position and filepath and proxy_filepath:
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+    # Чтение данных из Excel
     data = pd.read_excel(config.EXCEL_FILE).to_dict('list')
     return render_template('3win_v2.html', data=data, module_name=module_name)
+
 
 @app.route('/3win_v3', methods=['GET', 'POST'])
 def module_3win_v3():
@@ -90,22 +77,24 @@ def module_3win_v3():
         for i in range(1, 4):
             fio = request.form[f'fio{i}']
             position = request.form[f'position{i}']
-            file = request.files[f'photo{i}']
-            # avatar = request.form['image']
+            filepath = request.form[f'photo_path{i}']
+            proxy_filepath = request.form[f'proxy_path{i}']
 
-            if fio and position and file:
-                filename = file.filename
-                filepath = os.path.join(upload_folder, filename)
-                file.save(filepath)
-                proxy_filename = f'{os.path.splitext(filename)[0]}_proxy.png'
-                proxy_filepath = os.path.join(config.PROXY_FOLDER, proxy_filename)
-
-                services.convert_for_avatar(filepath, proxy_filepath)
-                services.update_excel(module_name, fio, position, filepath, i)
-
-# Чтение данных из Excel
+            if fio and position and filepath and proxy_filepath:
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+    # Чтение данных из Excel
     data = pd.read_excel(config.EXCEL_FILE).to_dict('list')
     return render_template('3win_v3.html', data=data, module_name=module_name)
+
+
+@app.route('/get_people')
+def get_people():
+    conn = sqlite3.connect('avid.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT fio, position, photo, avatar FROM virt")
+    people = cursor.fetchall()
+    conn.close()
+    return jsonify([{'fio': person[0], 'position': person[1], 'photo_path': person[2], 'proxy_path': person[3]} for person in people])
 
 
 if __name__ == '__main__':

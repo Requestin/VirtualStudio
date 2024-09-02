@@ -1,117 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3 окна версия 3</title>
-    <style>
-        .section {
-            border: 2px solid #000;
-            margin: 10px;
-            padding: 10px;
-        }
-        .section h2 {
-            margin-top: 0;
-        }
-        .form-group {
-            margin-bottom: 10px;
-        }
-    </style>
-
-</head>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>3 окна версия 3</title>
+        <script src="{{ url_for('static', filename='scripts/3win_scripts.js') }}"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/3win_styles.css') }}">
+    </head>
 <body>
-    <h1>3 окна версия 1</h1>
-    <form method="POST" enctype="multipart/form-data">
-        <div class="section">
-            <h2>Объект 1</h2>
-            <div class="form-group">
-                <label for="fio1">ФИО:</label>
-                <input type="text" id='fio1' name="fio1">
+    <a href="{{ url_for('index') }}" class="button back-button">Назад</a>
+    <div class="container">
+        <h1>3 окна версия 3</h1>
+        
+        <h2>Текущие данные</h2>
+        <table>
+            <tr>
+                <th>Объект</th>
+                <th>ФИО</th>
+                <th>Должность</th>
+                <th>Путь</th>
+                <th>Аватар</th>
+            </tr>
+            {% for i in range(1, 4) %}
+            <tr>    
+                <td class="object-number">Объект {{ i }}</td>
+                <td>{{ data[module_name + ' ФИО ' + i|string][0] }}</td>
+                <td>{{ data[module_name + ' ДОЛЖНОСТЬ ' + i|string][0] }}</td>
+                <td>{{ data[module_name + ' ПУТЬ ' + i|string][0] }}</td>
+                <td>{{ data[module_name + ' АВАТАР ' + i|string][0] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <br>
+        <form method="POST" enctype="multipart/form-data">
+            {% for i in range(1, 4) %}
+            <div class="section">
+                <h2>Объект {{ i }}</h2>
+                <div class="form-group">
+                    <label for="fio{{ i }}">ФИО:</label>
+                    <input type="text" id='fio{{ i }}' name="fio{{ i }}" readonly>
+                    <button type="button" class="button select-button" onclick="openModal({{ i }})">Выбрать</button>
+                </div>
+                <div class="form-group">
+                    <label for="position{{ i }}">Должность</label>
+                    <input type="text" id='position{{ i }}' name="position{{ i }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="photo_path{{ i }}">Путь до фото</label>
+                    <input type="text" id='photo_path{{ i }}' name="photo_path{{ i }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="proxy_path{{ i }}">Путь до прокси-аватара</label>
+                    <input type="text" id='proxy_path{{ i }}' name="proxy_path{{ i }}" readonly>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="position1">Должность</label>
-                <input type="text" id='position1' name="position1">
-            </div>
-            <div class="form-group">
-                <label for="photo1">Загрузить фото</label>
-                <input type="file" id="photo1" name="photo1">
-            </div>
+            {% endfor %}
+            <input type="submit" value="Сохранить" class="button save-button">
+        </form>
+
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Выберите человека</h2>
+            <ul id="personList">
+                <!-- Список людей будет загружен сюда -->
+            </ul>
         </div>
-        <div class="section">
-            <h2>Объект 2</h2>
-            <div class="form-group">
-                <label for="fio2">ФИО:</label>
-                <input type="text" id='fio2' name="fio2">
-            </div>
-            <div class="form-group">
-                <label for="position2">Должность</label>
-                <input type="text" id='position2' name="position2">
-            </div>
-            <div class="form-group">
-                <label for="photo2">Загрузить фото</label>
-                <input type="file" id="photo2" name="photo2">
-            </div>
-        </div>
-        <div class="section">
-            <h2>Объект 3</h2>
-            <div class="form-group">
-                <label for="fio3">ФИО:</label>
-                <input type="text" id='fio3' name="fio3">
-            </div>
-            <div class="form-group">
-                <label for="position3">Должность</label>
-                <input type="text" id='position3' name="position3">
-            </div>
-            <div class="form-group">
-                <label for="photo3">Загрузить фото</label>
-                <input type="file" id="photo3" name="photo3">
-            </div>
-        </div>
+    </div>
 
-        <input type="submit" value="Сохранить">
-    </form>
-
-    <h2>Текущие данные</h2>
-    <table border="1">
-        <tr>
-            <th>ФИО</th>
-            <th>Должность</th>
-            <th>Путь</th>
-            <th>Аватар<th>
-        </tr>
-        <tr>    
-            <td>{{ data[module_name + ' ФИО 1'][0] }}</td>
-            <td>{{ data[module_name + ' ДОЛЖНОСТЬ 1'][0] }}</td>
-            <td>{{ data[module_name + ' ПУТЬ 1'][0] }}</td>
-            <td>{{ data[module_name + ' АВАТАР 1'][0] }}</td>
-        </tr>
-
-        <tr>
-            <th>ФИО</th>
-            <th>Должность</th>
-            <th>Путь</th>
-            <th>Аватар<th>
-        </tr>
-        <tr>    
-            <td>{{ data[module_name + ' ФИО 2'][0] }}</td>
-            <td>{{ data[module_name + ' ДОЛЖНОСТЬ 2'][0] }}</td>
-            <td>{{ data[module_name + ' ПУТЬ 2'][0] }}</td>
-            <td>{{ data[module_name + ' АВАТАР 2'][0] }}</td>
-        </tr>
-
-        <tr>
-            <th>ФИО</th>
-            <th>Должность</th>
-            <th>Путь</th>
-            <th>Аватар<th>
-        </tr>
-        <tr>    
-            <td>{{ data[module_name + ' ФИО 3'][0] }}</td>
-            <td>{{ data[module_name + ' ДОЛЖНОСТЬ 3'][0] }}</td>
-            <td>{{ data[module_name + ' ПУТЬ 3'][0] }}</td>
-            <td>{{ data[module_name + ' АВАТАР 3'][0] }}</td>
-        </tr>
-    </table>
-    <button onclick="window.location.href='{{ url_for('index') }}'">Назад</button>
 </body>
 </html>

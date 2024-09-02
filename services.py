@@ -105,17 +105,3 @@ def convert_for_avatar(input_path, output_path, size=(300, 375), max_kb=100, bg_
             quality = max(1, int(95 * (max_kb * 1024) / os.path.getsize(output_path)))  # Вычисляем новое качество
             img.save(output_path, format='JPEG', quality=quality)  # Сохраняем изображение с новым качеством
 
-
-# def convert_for_avatar(image_path, output_path, size=(300, 375), max_size_kb = 49):
-#     try:
-#         with Image.open(image_path) as img:
-#             img = img.resize(size, Image.LANCZOS)
-#             img.save(output_path, format='PNG', optimize=True)
-
-#         while os.path.getsize(output_path) > max_size_kb * 1024:
-#             quality = max(10, int(100 * (max_size_kb * 1024 / os.path.getsize(output_path))))
-#             img.save(output_path, format='PNG', quality=quality, optimize=True)
-#     except Exception as e:
-#         print(f'Ошибка {e}')
-#         raise
-
