@@ -2,7 +2,6 @@ import pandas as pd
 import os
 import config
 from PIL import Image
-import cv2
 
 
 def create_excel():
@@ -70,6 +69,11 @@ def create_excel():
         print(f'Файл {config.EXCEL_FILE} уже существует!')
 
 
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
+
+
 def update_excel(module_name, fio, position, filepath, proxy_filepath, i):
     df = pd.read_excel(config.EXCEL_FILE)
     fio_col = f'{module_name} ФИО {i}'
@@ -85,39 +89,21 @@ def update_excel(module_name, fio, position, filepath, proxy_filepath, i):
     df.to_excel(config.EXCEL_FILE, index = False)
 
 
-def convert_for_avatar(image_path, output_path, size=(300, 375), max_size_kb=49):
-    try:
-        with Image.open(image_path) as img:
-            # Изменение размера изображения
-            img = img.resize(size, Image.LANCZOS)
+def convert_for_avatar(input_path, output_path, size=(300, 375), max_kb=100, bg_color=(0, 37, 76)):
+    with Image.open(input_path) as img:  # Открываем изображение
+        img = img.resize(size, Image.LANCZOS)  # Изменяем размер изображения с использованием высококачественного фильтра
+        
+        if img.mode == 'RGBA':  # Проверяем наличие альфа-канала
+            background = Image.new('RGBA', img.size, bg_color + (255,))  # Создаем фон с указанным цветом
+            img = Image.alpha_composite(background, img).convert('RGB')  # Накладываем изображение на фон и конвертируем в RGB
+        else:
+            img = img.convert('RGB')  # Конвертируем изображение в RGB, если нет альфа-канала
 
-            # Начальное сохранение с качеством 95 в формате JPEG
-            quality = 95
-            img.save(output_path, format='JPEG', quality=quality, optimize=True)
-
-            # Проверка размера файла и уменьшение качества, если необходимо
-            last_size = os.path.getsize(output_path)
-            while last_size > max_size_kb * 1024 and quality > 10:
-                quality -= 5  # Уменьшаем качество на 5%
-
-                # Повторное сохранение с новым качеством
-                img.save(output_path, format='JPEG', quality=quality, optimize=True)
-
-                current_size = os.path.getsize(output_path)
-                if current_size >= last_size:
-                    # Если размер файла не уменьшается, прекращаем цикл
-                    print("Дальнейшее уменьшение качества не влияет на размер файла.")
-                    break
-
-                last_size = current_size
-
-            final_size_kb = os.path.getsize(output_path) / 1024
-            print(f"Финальный размер изображения: {final_size_kb:.2f} КБ, с качеством: {quality}")
-
-    except Exception as e:
-        print(f"Ошибка обработки изображения: {e}")
-        raise
-
+        img.save(output_path, format='JPEG', quality=95)  # Сохраняем изображение в формате JPEG с качеством 95
+        
+        while os.path.getsize(output_path) > max_kb * 1024:  # Проверяем размер файла и корректируем качество
+            quality = max(1, int(95 * (max_kb * 1024) / os.path.getsize(output_path)))  # Вычисляем новое качество
+            img.save(output_path, format='JPEG', quality=quality)  # Сохраняем изображение с новым качеством
 
 
 # def convert_for_avatar(image_path, output_path, size=(300, 375), max_size_kb = 49):

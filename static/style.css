@@ -1,0 +1,52 @@
+/* Основной стиль для кнопки */
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 5px;
+    margin-top: 10px;   
+}
+
+/* Стиль для модального окна */
+.modal {
+    display: none; /* По умолчанию скрыто */
+    position: fixed; /* Остаётся на месте */
+    z-index: 1; /* Показывается поверх других элементов */
+    left: 0;
+    top: 0;
+    width: 100%; /* Полная ширина */
+    height: 100%; /* Полная высота */
+    overflow: auto; /* Включаем прокрутку */
+    background-color: rgba(0,0,0,0.4); /* Полупрозрачный чёрный фон */   
+}
+
+/* Показывать модальное окна когда якорь активен */
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% от верхней границы окна */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%; /* Ширина модального окна */
+    position: relative;
+}
+
+/* Стиль для кнопки закрытия */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    text-decoration: none;
+    color: #333;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: red;
+}

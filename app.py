@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 import os
 import pandas as pd
 import services, config
+import database as db
 
 app = Flask(__name__)
 
@@ -11,6 +12,27 @@ upload_folder = config.UPLOAD_FOLDER
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/add_person', methods=['GET', 'POST'])
+def add_person():
+    if request.method == 'POST':
+        fio = request.form['fio']
+        position = request.form['position']
+        file = request.files['photo']
+
+        if fio and position and file and services.allowed_file(file.filename):
+            filename = file.filename
+            filepath = os.path.join(upload_folder, filename)
+            file.save(filepath)
+
+            proxy_filename = f'proxy_{filename}'
+            proxy_filepath = os.path.join(config.PROXY_FOLDER, proxy_filename)
+            services.convert_for_avatar(filepath, proxy_filepath)
+            db.db_add_new_person(fio, position, filepath, proxy_filepath)
+        return redirect(url_for('index'))
+    else:
+        return "Ошибка добавления данных"
 
 
 @app.route('/3win_v1', methods=['GET', 'POST'])
@@ -87,5 +109,6 @@ def module_3win_v3():
 
 
 if __name__ == '__main__':
+    db.db_connect()
     services.create_excel()
     app.run(debug=True)

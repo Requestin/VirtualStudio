@@ -4,20 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Выбор модуля</title>
+    <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
+    <!-- Кнопка для добавления человека -->
+    <a href="#modal" class="button" onclick="document.getElementById('modal').style.display='block'">Добавить человека</a>
+
+    <!-- Модальное окно для добавления человека -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <a href="#" class="close" onclick="document.getElementById('modal').style.display='none'">&times;</a>  <!-- Кнопка закрытия модального окна -->
+            <h2>Добавление человека</h2>
+            <form action="{{ url_for('add_person') }}" method="post" enctype="multipart/form-data">
+                <input type="text" name="fio" placeholder="ФИО" required> <br><br>
+                <input type="text" name="position" placeholder="Должность" required> <br><br>
+                <input type="file" name="photo" accept="image/*" required> <br><br>
+                <button type="submit">Добавить</button>
+            </form>
+        </div>
+    </div>
+                
     <h1>Выберите модуль для работы</h1>
     
     <a href="{{ url_for('module_3win_v1') }}">
         <button>3 окна версия 1</button>
-    </a>
-    <br><br>
-    <a href="{{ url_for('module_3win_v2') }}">
-        <button>3 окна версия 2</button>
-    </a>
-    <br><br>
-    <a href="{{ url_for('module_3win_v3') }}">
-        <button>3 окна версия 3</button>
     </a>
 </body>
 </html>
