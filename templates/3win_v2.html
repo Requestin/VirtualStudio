@@ -4,8 +4,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>3 окна версия 1</title>
-        <script src="{{ url_for('static', filename='scripts/3win_scripts.js') }}"></script>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/3win_styles.css') }}">
+        <script src="{{ url_for('static', filename='scripts/win_scripts.js') }}"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/win_styles.css') }}">
     </head>
 <body>
     <a href="{{ url_for('index') }}" class="button back-button">Назад</a>
@@ -18,7 +18,7 @@
                 <th>Объект</th>
                 <th>ФИО</th>
                 <th>Должность</th>
-                <th>Путь</th>
+                <th>Фото</th>
                 <th>Аватар</th>
             </tr>
             {% for i in range(1, 4) %}
@@ -51,7 +51,7 @@
                     <input type="text" id='photo_path{{ i }}' name="photo_path{{ i }}" readonly>
                 </div>
                 <div class="form-group">
-                    <label for="proxy_path{{ i }}">Путь до прокси-аватара</label>
+                    <label for="proxy_path{{ i }}">Путь до аватара</label>
                     <input type="text" id='proxy_path{{ i }}' name="proxy_path{{ i }}" readonly>
                 </div>
             </div>

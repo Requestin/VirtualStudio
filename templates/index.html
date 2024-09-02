@@ -13,9 +13,23 @@
 
     <div class="container">
         <h1 class="main-title">Выберите модуль для работы</h1><br><br>
-        <a href="{{ url_for('module_3win_v1') }}"><button class="module-button">Модуль 1</button></a>
-        <a href="{{ url_for('module_3win_v2') }}"><button class="module-button">Модуль 2</button></a>
-        <a href="{{ url_for('module_3win_v3') }}"><button class="module-button">Модуль 3</button></a>
+        
+        <div class="module-block">
+            <h2 class="main-title">Тройные окна</h2><br>
+            <a href="{{ url_for('module_3win_v1') }}"><button class="module-button">3 окна v1</button></a>
+            <a href="{{ url_for('module_3win_v2') }}"><button class="module-button">3 окна v2</button></a>
+            <a href="{{ url_for('module_3win_v3') }}"><button class="module-button">3 окна v3</button></a>
+        </div>
+        
+        <div class="module-block">
+            <h2 class="main-title">Двойные окна</h2><br>
+            <a href="{{ url_for('module_2win_v1') }}"><button class="module-button">2 окна v1</button></a>
+        </div>
+        
+        <div class="module-block">
+            <h2 class="main-title">Одно окно</h2><br>
+            <a href="{{ url_for('module_1win_v1') }}"><button class="module-button">1 окно v1</button></a>
+        </div>
     </div>
 
     <!-- Модальное окно для добавления человека -->

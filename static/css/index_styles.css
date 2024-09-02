@@ -11,6 +11,24 @@ body {
     background-attachment: fixed;
 }
 
+.module-block {
+    background-color: #cccccc13;
+    border: 2px solid #cccccc75;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.module-block h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.module-button {
+    margin: 5px;
+}
+
 .container {
     text-align: center;
 }
