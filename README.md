@@ -1,29 +1,14 @@
 *GYHYRY branch*
 
 
-## Installing:
+# Installing:
+  ## For Windows Users
+  1. Run ```.\install.ps1```
+  2. Wait for **success message**
+  3. Run ```.\run.ps1```
 
-  ### After cloning repo recommend to create a new environment, for not junk your global python interpreter.
-
-  For creating new environment:
-  
-  ```python3 -m venv venv```
-  #### After this you need to activate it
-      
-  For **MacOS/Unix** users:
-    
-  ```source /venv/bin/activate```
-      
-  For Windows users:
-      
-  ```./venv/Scripts/activate```
-
-  ### When the environment is active:
-  Use **pip package manager** for installing the dependencies:
-  
-  ```pip install -r requirements.txt```
-  
-
-  After this you need to run the **app.py** file for starting web server:
-  
-  ```python3 app.py```
+  ## For Linux/Unix:
+  1. Run ```chmod +x install.sh```
+  2. Run ```./install.sh```
+  3. Wait for **success message**
+  4. Run ```python3 app.py```
