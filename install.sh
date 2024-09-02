@@ -3,7 +3,7 @@
 # Функция для создания директорий
 create_directories() {
     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
-        mkdir -p data\proxy data\uploads
+        mkdir -p data/proxy data/uploads
     else
         mkdir -p data/proxy data/uploads
     fi
