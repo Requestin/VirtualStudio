@@ -1,6 +1,3 @@
-*GYHYRY branch*
-
-
 # Installing:
   ## For Windows Users
   1. Run ```.\install.ps1```
