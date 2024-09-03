@@ -66,23 +66,54 @@ def create_excel():
         '2win_v1 АВАТАР 2': [''],
         #####
 
+        '2win_v2 ФИО 1': [''],
+        '2win_v2 ДОЛЖНОСТЬ 1': [''],
+        '2win_v2 ПУТЬ 1': [''],
+        '2win_v2 АВАТАР 1': [''],
+        
+        '2win_v2 ФИО 2': [''],
+        '2win_v2 ДОЛЖНОСТЬ 2': [''],
+        '2win_v2 ПУТЬ 2': [''],
+        '2win_v2 АВАТАР 2': [''],
+        #####
+
+        '2win_v3 ФИО 1': [''],
+        '2win_v3 ДОЛЖНОСТЬ 1': [''],
+        '2win_v3 ПУТЬ 1': [''],
+        '2win_v3 АВАТАР 1': [''],
+        
+        '2win_v3 ФИО 2': [''],
+        '2win_v3 ДОЛЖНОСТЬ 2': [''],
+        '2win_v3 ПУТЬ 2': [''],
+        '2win_v3 АВАТАР 2': [''],
+        #####
+
         '1win_v1 ФИО 1': [''],
         '1win_v1 ДОЛЖНОСТЬ 1': [''],
         '1win_v1 ПУТЬ 1': [''],
         '1win_v1 АВАТАР 1': [''],
+        #####
+
+        '1win_v2 ФИО 1': [''],
+        '1win_v2 ДОЛЖНОСТЬ 1': [''],
+        '1win_v2 ПУТЬ 1': [''],
+        '1win_v2 АВАТАР 1': [''],
+        #####
+
+        '1win_v3 ФИО 1': [''],
+        '1win_v3 ДОЛЖНОСТЬ 1': [''],
+        '1win_v3 ПУТЬ 1': [''],
+        '1win_v3 АВАТАР 1': [''],
         #####
         }
 
         # Создаем DataFrame
         df = pd.DataFrame(data)
 
-        # Путь к файлу Excel
-        excel_file = 'data/data.xlsx'
-
         # Сохраняем DataFrame в Excel
-        df.to_excel(excel_file, index=False)
+        df.to_excel(config.EXCEL_FILE, index=False)
 
-        print(f"Файл {excel_file} успешно создан.")
+        print(f"Файл {config.EXCEL_FILE} успешно создан.")
     else:
         print(f'Файл {config.EXCEL_FILE} уже существует!')
 

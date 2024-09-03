@@ -36,11 +36,11 @@ def add_person():
         return "Ошибка добавления данных"
 
 
-@app.route('/3win_v1', methods=['GET', 'POST'])
-def module_3win_v1():
-    module_name = '3win_v1'
+@app.route('/1win_v1', methods=['GET', 'POST'])
+def module_1win_v1():
+    module_name = '1win_v1'
     if request.method == 'POST':
-        for i in range(1, 4):
+        for i in range(1, 2):
             fio = request.form[f'fio{i}']
             position = request.form[f'position{i}']
             filepath = request.form[f'photo_path{i}']
@@ -50,7 +50,42 @@ def module_3win_v1():
                 services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
     # Чтение данных из Excel
     data = pd.read_excel(config.EXCEL_FILE).to_dict('list')
-    return render_template('3win_v1.html', data=data, module_name=module_name)
+    return render_template('1win_v1.html', data=data, module_name=module_name)
+
+
+@app.route('/1win_v2', methods=['GET', 'POST'])
+def module_1win_v2():
+    module_name = '1win_v2'
+    if request.method == 'POST':
+        for i in range(1, 2):
+            fio = request.form[f'fio{i}']
+            position = request.form[f'position{i}']
+            filepath = request.form[f'photo_path{i}']
+            proxy_filepath = request.form[f'proxy_path{i}']
+
+            if fio and position and filepath and proxy_filepath:
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+    # Чтение данных из Excel
+    data = pd.read_excel(config.EXCEL_FILE).to_dict('list')
+    return render_template('1win_v2.html', data=data, module_name=module_name)
+
+@app.route('/1win_v3', methods=['GET', 'POST'])
+def module_1win_v3():
+    module_name = '1win_v3'
+    if request.method == 'POST':
+        for i in range(1, 2):
+            fio = request.form[f'fio{i}']
+            position = request.form[f'position{i}']
+            filepath = request.form[f'photo_path{i}']
+            proxy_filepath = request.form[f'proxy_path{i}']
+
+            if fio and position and filepath and proxy_filepath:
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+    # Чтение данных из Excel
+    data = pd.read_excel(config.EXCEL_FILE).to_dict('list')
+    return render_template('1win_v3.html', data=data, module_name=module_name)
+
+
 
 
 @app.route('/2win_v1', methods=['GET', 'POST'])
@@ -70,11 +105,11 @@ def module_2win_v1():
     return render_template('2win_v1.html', data=data, module_name=module_name)
 
 
-@app.route('/1win_v1', methods=['GET', 'POST'])
-def module_1win_v1():
-    module_name = '1win_v1'
+@app.route('/2win_v2', methods=['GET', 'POST'])
+def module_2win_v2():
+    module_name = '2win_v2'
     if request.method == 'POST':
-        for i in range(1, 2):
+        for i in range(1, 3):
             fio = request.form[f'fio{i}']
             position = request.form[f'position{i}']
             filepath = request.form[f'photo_path{i}']
@@ -84,7 +119,41 @@ def module_1win_v1():
                 services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
     # Чтение данных из Excel
     data = pd.read_excel(config.EXCEL_FILE).to_dict('list')
-    return render_template('1win_v1.html', data=data, module_name=module_name)
+    return render_template('2win_v2.html', data=data, module_name=module_name)
+
+
+@app.route('/2win_v3', methods=['GET', 'POST'])
+def module_2win_v3():
+    module_name = '2win_v3'
+    if request.method == 'POST':
+        for i in range(1, 3):
+            fio = request.form[f'fio{i}']
+            position = request.form[f'position{i}']
+            filepath = request.form[f'photo_path{i}']
+            proxy_filepath = request.form[f'proxy_path{i}']
+
+            if fio and position and filepath and proxy_filepath:
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+    # Чтение данных из Excel
+    data = pd.read_excel(config.EXCEL_FILE).to_dict('list')
+    return render_template('2win_v3.html', data=data, module_name=module_name)
+
+
+@app.route('/3win_v1', methods=['GET', 'POST'])
+def module_3win_v1():
+    module_name = '3win_v1'
+    if request.method == 'POST':
+        for i in range(1, 4):
+            fio = request.form[f'fio{i}']
+            position = request.form[f'position{i}']
+            filepath = request.form[f'photo_path{i}']
+            proxy_filepath = request.form[f'proxy_path{i}']
+
+            if fio and position and filepath and proxy_filepath:
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+    # Чтение данных из Excel
+    data = pd.read_excel(config.EXCEL_FILE).to_dict('list')
+    return render_template('3win_v1.html', data=data, module_name=module_name)
 
 
 @app.route('/3win_v2', methods=['GET', 'POST'])
