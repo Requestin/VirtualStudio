@@ -107,8 +107,9 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    max-width: 800px;
     width: 90%;
+    max-width: 800px;
+    margin: 20px auto;
 }
 
 h1, h2 {
@@ -119,7 +120,7 @@ h1, h2 {
 }
 
 .button {
-    background-color: #007bff;
+    background-color: rgb(0, 75, 50);
     color: white;
     padding: 10px 20px;
     border: none;
@@ -132,7 +133,7 @@ h1, h2 {
 }
 
 .button:hover {
-    background-color: darkgreen; /* Темно-зеленый цвет при наведении */
+    background-color: rgb(0, 35, 75); /* Темно-зеленый цвет при наведении */
 
 }
 
@@ -166,7 +167,7 @@ h1, h2 {
 }
 
 .save-button {
-    background-color: #28a745;
+    background-color: rgb(0, 75, 50);
     margin-top: 20px;
     display: block;
     width: 200px;
@@ -175,7 +176,7 @@ h1, h2 {
 }
 
 .save-button:hover {
-    background-color: #218838;
+    background-color: rgb(0, 35, 75);
 }
 
 table {
@@ -185,12 +186,15 @@ table {
     margin-top: 20px;
     background-color: white;
     border: 2px solid #000;
+    table-layout: fixed;
 }
 
 th, td {
     border: 1px solid #ddd;
     padding: 12px;
     text-align: left;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 th {
@@ -279,4 +283,19 @@ td:last-child, th:last-child {
 
 #personList li:hover {
     background-color: #f1f1f1;
+}
+
+@media screen and (max-width: 600px) {
+    .container {
+        width: 95%;
+        padding: 10px;
+    }
+    
+    table {
+        font-size: 14px;
+    }
+    
+    th, td {
+        padding: 6px;
+    }
 }

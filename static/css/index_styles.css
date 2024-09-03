@@ -44,11 +44,10 @@ body {
     margin-bottom: 20px;
 }
 
-.add-person-btn,
 .module-button {
     font-family: Arial, sans-serif;
     padding: 10px 15px; /* Увеличиваем отступы */
-    background-color: #007bff;
+    background-color: rgb(0, 75, 50);
     color: white;
     border: none;
     border-radius: 20px; /* Увеличиваем радиус скругления */
@@ -59,7 +58,8 @@ body {
 
 .add-person-btn:hover,
 .module-button:hover {
-    background-color: #0056b3;
+    background-color: rgb(0, 35, 75);
+    
 }
 
 .add-person-btn {
@@ -128,15 +128,16 @@ body {
     text-align: center;
     text-decoration: none;
     color: white;
-    background-color: #007BFF; /* Задаем синий цвет */
+    background-color: rgb(0, 75, 50); /* Задаем синий цвет */
     border: none;
     border-radius: 20px;
     margin: 10px; /* Добавляем отступы между кнопками */
     cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
 }
 
 .module-button:hover {
-    background-color: darkgreen; /* Темно-зеленый цвет при наведении */
+    background-color: rgb(0, 35, 75); /* Темно-зеленый цвет при наведении */
 }
 
 .container {
@@ -161,14 +162,15 @@ body {
     top: 20px;
     left: 20px;
     padding: 20px 40px;
-    background-color: #007bff;
+    background-color: rgb(0, 75, 50);
     color: white;
     border: none;
     border-radius: 15px;
     cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
 }
 .add-person-btn:hover {
-    background-color: darkgreen;
+    background-color: rgb(0, 35, 75);
 }
 
 .modal form input[type="text"],
@@ -196,7 +198,7 @@ body {
 
 .modal form button[type="submit"] {
     font-family: Arial, sans-serif;
-    background-color: #007bff;
+    background-color: rgb(0, 75, 50);
     color: white;
     padding: 10px 20px;
     border: none;
@@ -207,7 +209,7 @@ body {
 }
 
 .modal form button[type="submit"]:hover {
-    background-color: darkgreen;
+    background-color: rgb(0, 35, 75);
     transition: background-color 0.3s;
 }
 
@@ -215,16 +217,4 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center; /* Центрируем поля ввода */
-}
-
-.modal form button[type="submit"] {
-    width: 50%; /* Уменьшаем ширину кнопки */
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s, transform 0.1s;
 }
