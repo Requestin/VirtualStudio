@@ -143,6 +143,97 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            z-index: 1999;
+        }
+        #result-modal {
+            position: fixed;
+            top: 45%;
+            left: 50.5%;
+            width: 1030px;
+            height: 760px;
+            border: 3px solid rgb(0, 75, 50);
+            border-radius: 5px;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 35, 75, 0.9);
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            flex-direction: row;
+            align-items: flex-start;
+            display: none;
+            z-index: 2000
+        }
+        #result-image-container {
+            width: 607px;
+            height: 749px;
+            border: 3px solid rgb(0, 75, 50);
+            border-radius: 5px;
+            background-color: rgb(0, 35, 75);
+            overflow: hidden;
+            margin-top: 5px;
+            display: none; /* Скрываем по умолчанию */
+        }
+        #result-image {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        #comment-container {
+            display: flex;
+            flex-direction: column;
+            margin-top: 5px;
+            margin-left: 10px;
+            display: none; /* Скрываем по умолчанию */
+        }
+        #delete-comment-container {
+            width: 360px;
+            height: 115px; /* Фиксируем высоту */
+        }
+        #delete-comment {
+            width: 100%;
+            height: 100%;
+            padding: 12px 24px;
+            font-size: 24px;
+            background-color: rgb(0, 75, 50);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            resize: none; /* Запрещаем изменение размера */
+        }
+        #delete-comment:focus {
+            background-color: rgb(0, 25, 55);
+        }
+        #continue-btn-container {
+            display: none; /* Скрываем по умолчанию */
+            margin-top: 40px;
+        }
+        #delete-btn-container {
+            display: none; /* Скрываем по умолчанию */
+            margin-top: 5px;
+        }
+        #notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgb(0, 75, 50);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 3000;
+            font-size: 36px
+        }
     </style>
 </head>
 <body>
@@ -172,6 +263,24 @@
     <div id="loading-overlay">
         <div class="spinner"></div>
     </div>
+    <div id="modal-overlay"></div>
+    <div id="result-modal">
+        <div id="result-image-container">
+            <img id="result-image" src="" alt="Результат">
+        </div>
+        <div id="comment-container">
+            <div id="delete-comment-container">
+                <textarea id="delete-comment" class="text-input" placeholder="Комментарий при удалении (необязательно)"></textarea>
+            </div>
+            <div id="continue-btn-container">
+                <button id="continue-btn" class="action-btn">Продолжить</button>
+            </div>
+            <div id="delete-btn-container">
+                <button id="delete-btn" class="action-btn">Удалить фото</button>
+            </div>
+        </div>
+    </div>
+    <div id="notification"></div>
     <script>
         const previewContainer = document.getElementById('preview-container');
         const previewImage = document.getElementById('preview-image');
@@ -180,6 +289,16 @@
         const saveBtn = document.getElementById('save-btn');
         const nameInput = document.getElementById('name-input');
         const positionInput = document.getElementById('position-input');
+        const resultModal = document.getElementById('result-modal');
+        const resultImageContainer = document.getElementById('result-image-container');
+        const resultImage = document.getElementById('result-image');
+        const commentContainer = document.getElementById('comment-container');
+        const continueBtnContainer = document.getElementById('continue-btn-container');
+        const deleteBtnContainer = document.getElementById('delete-btn-container');
+        const continueBtn = document.getElementById('continue-btn');
+        const deleteBtn = document.getElementById('delete-btn');
+        const deleteComment = document.getElementById('delete-comment');
+        const notification = document.getElementById('notification');
 
         let isDragging = false;
         let startX, startY;
@@ -188,6 +307,7 @@
         let currentImageName = '';
         let isImageLoaded = false;
         let isSaving = false;
+        let savedFilePath = '';
 
         uploadBtn.addEventListener('click', function() {
             console.log('Кнопка загрузки нажата');
@@ -323,13 +443,31 @@
             document.getElementById('loading-overlay').style.display = 'none';
         }
 
-        window.addEventListener('beforeunload', function (e) {
-            if (isSaving) {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
-            }
-        });
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 1000);
+        }
+
+        function showResultModal() {
+            document.getElementById('modal-overlay').style.display = 'block';
+            resultModal.style.display = 'flex';
+            resultImageContainer.style.display = 'block';
+            commentContainer.style.display = 'flex';
+            continueBtnContainer.style.display = 'block';
+            deleteBtnContainer.style.display = 'block';
+        }
+
+        function hideResultModal() {
+            document.getElementById('modal-overlay').style.display = 'none';
+            resultModal.style.display = 'none';
+            resultImageContainer.style.display = 'none';
+            commentContainer.style.display = 'none';
+            continueBtnContainer.style.display = 'none';
+            deleteBtnContainer.style.display = 'none';
+        }
 
         saveBtn.addEventListener('click', (e) => {
             if (saveBtn.disabled) {
@@ -379,7 +517,10 @@
                 hideLoadingOverlay();
                 isSaving = false;
                 if (data.success) {
-                    alert('Изображение успешно обработано и сохранено: ' + data.file_path);
+                    savedFilePath = data.file_path;
+                    const filePath = `/get_image/${encodeURIComponent(data.file_path)}`;
+                    resultImage.src = filePath;
+                    showResultModal(); // Отображаем модальное окно
                 } else {
                     alert('Ошибка при обработке изображения: ' + data.error);
                 }
@@ -389,6 +530,45 @@
                 isSaving = false;
                 console.error('Ошибка:', error);
                 alert('Произошла ошибка при сохранении изображения');
+            });
+        });
+
+        continueBtn.addEventListener('click', () => {
+            hideResultModal();
+            showNotification('Фото успешно сохранено');
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        });
+
+        deleteBtn.addEventListener('click', () => {
+            const comment = deleteComment.value.trim();
+
+            fetch('/delete_image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    file_path: savedFilePath,
+                    comment: comment
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    hideResultModal();
+                    showNotification('Фото удалено');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    alert('Ошибка при перемещении изображения: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при перемещении изображения');
             });
         });
 

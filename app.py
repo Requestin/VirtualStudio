@@ -1,7 +1,7 @@
 # Импортируем модуль для работы с операционной системой
 import os
 # Импортируем необходимые компоненты из Flask
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_file
 # Импортируем клиент Gradio и функцию для обработки файлов
 from gradio_client import Client, handle_file
 # Импортируем модуль для работы с изображениями
@@ -14,6 +14,8 @@ import base64
 import tempfile
 # Импортируем модуль для работы со временем
 import time
+# Импортируем модуль для работы с путями
+import shutil
 
 # Создаем экземпляр Flask приложения
 app = Flask(__name__)
@@ -110,6 +112,52 @@ def save_image():
                 os.remove(temp_file_path)
             except:
                 pass
+
+# Определяем маршрут для удаления изображения, принимающий POST запросы
+@app.route('/delete_image', methods=['POST'])
+def delete_image():
+    data = request.json
+    file_path = data.get('file_path')
+    comment = data.get('comment', '')
+
+    try:
+        if os.path.exists(file_path):
+            # Создаем директорию DELETED, если она не существует
+            deleted_path = r'G:\!PORTRETY_DATABASE\DELETED'
+            if not os.path.exists(deleted_path):
+                os.makedirs(deleted_path)
+            
+            # Формируем путь для перемещения файла
+            base_filename = os.path.basename(file_path)
+            deleted_file_path = os.path.join(deleted_path, base_filename)
+            
+            # Проверяем, существует ли файл с таким именем в папке DELETED
+            counter = 1
+            while os.path.exists(deleted_file_path):
+                filename_parts = os.path.splitext(base_filename)
+                deleted_file_path = os.path.join(deleted_path, f"{filename_parts[0]}_{counter}{filename_parts[1]}")
+                counter += 1
+            
+            # Перемещаем файл в папку DELETED
+            shutil.move(file_path, deleted_file_path)
+            
+            message = f"Фото перемещено в DELETED: {deleted_file_path}"
+            if comment:
+                message += f" Комментарий: {comment}"
+            print(message)
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Файл не найден'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# Определяем маршрут для получения изображения
+@app.route('/get_image/<path:filename>', methods=['GET'])
+def get_image(filename):
+    try:
+        return send_file(filename, mimetype='image/png')
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # Если скрипт запущен напрямую, запускаем Flask приложение
 if __name__ == '__main__':
