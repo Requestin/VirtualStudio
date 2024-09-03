@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVID плагин</title>
+    <link rel="stylesheet" href="static/css/index_styles.css">
+</head>
+<body>
+    <a href="#new_person_to_db" onclick="document.getElementById('modal').style.display='block'">
+        <button class="add-person-btn">Добавить человека в БД</button>
+    </a>
+
+    <div class="container">
+        <h1 class="main-title">Выберите модуль для работы</h1><br><br>
+        
+        <div class="module-block">
+            <h2 class="main-title">Тройные портреты</h2><br>
+            <a href="{{ url_for('module_3win_v1') }}"><button class="module-button">Тройные портреты 1</button></a>
+            <a href="{{ url_for('module_3win_v2') }}"><button class="module-button">Тройные портреты 2</button></a>
+            <a href="{{ url_for('module_3win_v3') }}"><button class="module-button">Тройные портреты 3</button></a>
+        </div>
+        
+        <div class="module-block">
+            <h2 class="main-title">Двойные портреты</h2><br>
+            <a href="{{ url_for('module_2win_v1') }}"><button class="module-button">Двойные портреты 1</button></a>
+            <a href="{{ url_for('module_2win_v2') }}"><button class="module-button">Двойные портреты 2</button></a>
+            <a href="{{ url_for('module_2win_v3') }}"><button class="module-button">Двойные портреты 3</button></a>
+        </div>
+        
+        <div class="module-block">
+            <h2 class="main-title">Одиночные портреты</h2><br>
+            <a href="{{ url_for('module_1win_v1') }}"><button class="module-button">Одиночный портрет 1</button></a>
+            <a href="{{ url_for('module_1win_v2') }}"><button class="module-button">Одиночный портрет 2</button></a>
+            <a href="{{ url_for('module_1win_v3') }}"><button class="module-button">Одиночный портрет 3</button></a>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления человека -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <a href="#" class="close" onclick="document.getElementById('modal').style.display='none'">&times;</a>  <!-- Кнопка закрытия модального окна -->
+            <h2 class="modal-title">Добавление человека</h2>
+            <form action="{{ url_for('add_person') }}" method="post" enctype="multipart/form-data">
+                <input type="text" name="fio" placeholder="ФИО" required> <br><br>
+                <input type="text" name="position" placeholder="Должность" required> <br><br>
+                <input type="file" name="photo" accept="image/*" required> <br><br>
+                <button type="submit">Добавить</button>
+            </form>
+        </div>
+    </div>
+                
+</body>
+</html>

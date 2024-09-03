@@ -1,0 +1,220 @@
+body {
+    background-image: url('/static/images/bg.png');
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.module-block {
+    background-color: #cccccc13;
+    border: 2px solid #cccccc75;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.module-block h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.module-button {
+    margin: 5px;
+}
+
+.container {
+    text-align: center;
+}
+
+
+.main-title {
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    background-color: rgba(0,0,0,0.5);
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.module-button {
+    font-family: Arial, sans-serif;
+    padding: 10px 15px; /* Увеличиваем отступы */
+    background-color: rgb(0, 75, 50);
+    color: white;
+    border: none;
+    border-radius: 20px; /* Увеличиваем радиус скругления */
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.add-person-btn:hover,
+.module-button:hover {
+    background-color: rgb(0, 35, 75);
+    
+}
+
+.add-person-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+}
+
+.module-button {
+    margin: 10px;
+    display: inline-block;
+}
+
+/* Стиль для модального окна */
+.modal {
+    display: none; /* По умолчанию скрыто */
+    position: fixed; /* Остаётся на месте */
+    z-index: 1; /* Показывается поверх других элементов */
+    left: 0;
+    top: 0;
+    width: 100%; /* Полная ширина */
+    height: 100%; /* Полная высота */
+    overflow: auto; /* Включаем прокрутку */
+    background-color: rgba(0,0,0,0.8); /* Полупрозрачный серый фон */
+}
+
+.modal-title {
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+}
+
+/* Показывать модальное окна когда якорь активен */
+.modal-content {
+    background-color: rgba(200,200,200,0.9);
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px; /* Уменьшаем максимальную ширину */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Стиль для кнопки закрытия */
+.close {
+    color: #333;
+    float: right;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: red;
+    text-decoration: none;
+    cursor: pointer;
+    
+}
+
+.module-button {
+    font-family: Arial, sans-serif;
+    display: inline-block;
+    padding: 30px 60px; /* Увеличиваем размер кнопок */
+    font-size: 24px; /* Увеличиваем размер текста */
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    background-color: rgb(0, 75, 50); /* Задаем синий цвет */
+    border: none;
+    border-radius: 20px;
+    margin: 10px; /* Добавляем отступы между кнопками */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.module-button:hover {
+    background-color: rgb(0, 35, 75); /* Темно-зеленый цвет при наведении */
+}
+
+.container {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+
+.main-title {
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+    background-color: rgba(0,0,0,0.5);
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.add-person-btn {
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 20px 40px;
+    background-color: rgb(0, 75, 50);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+}
+.add-person-btn:hover {
+    background-color: rgb(0, 35, 75);
+}
+
+.modal form input[type="text"],
+.modal form input[type="file"] {
+    width: 90%; /* Уменьшаем ширину полей */
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: rgba(255,255,255,0.8);
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.modal form input[type="text"]:focus,
+.modal form input[type="file"]:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+}
+
+.modal form input[type="file"] {
+    padding: 8px 15px;
+}
+
+.modal form button[type="submit"] {
+    font-family: Arial, sans-serif;
+    background-color: rgb(0, 75, 50);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+.modal form button[type="submit"]:hover {
+    background-color: rgb(0, 35, 75);
+    transition: background-color 0.3s;
+}
+
+.modal form {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Центрируем поля ввода */
+}
