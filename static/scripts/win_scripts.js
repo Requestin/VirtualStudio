@@ -11,6 +11,16 @@ function openModal(objectNumber) {
                 li.onclick = () => selectPerson(person, objectNumber);
                 personList.appendChild(li);
             });
+            
+            // Добавляем функциональность поиска
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                Array.from(personList.children).forEach(li => {
+                    const text = li.textContent.toLowerCase();
+                    li.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+            });
         });
 }
 

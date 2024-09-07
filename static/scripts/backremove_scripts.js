@@ -308,7 +308,7 @@ continueBtn.addEventListener('click', () => {
         if (result.success) {
             console.log('Аватар успешно создан:', result.avatar_path);
             hideResultModal();
-            showNotification('Фото успешно сохранено и аватар создан');
+            showNotification('Фото успешно сохранено');
             setTimeout(() => {
                 location.reload();
             }, 2000);

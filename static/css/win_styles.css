@@ -30,6 +30,8 @@
     border: 1px solid #888;
     width: 80%;
 }
+
+
 .close {
     color: #aaa;
     float: right;
@@ -283,6 +285,8 @@ td:last-child, th:last-child {
 #personList {
     list-style-type: none;
     padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 #personList li {
@@ -293,7 +297,6 @@ td:last-child, th:last-child {
 #personList li:hover {
     background-color: #f1f1f1;
 }
-
 @media screen and (max-width: 600px) {
     .container {
         width: 95%;
