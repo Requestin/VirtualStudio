@@ -198,7 +198,7 @@ def module_3win_v3():
 def get_people():
     conn = sqlite3.connect('avid.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT fio, position, photo, avatar FROM virt")
+    cursor.execute("SELECT fio, position, photo, avatar FROM virt ORDER BY fio COLLATE NOCASE")
     people = cursor.fetchall()
     conn.close()
     return jsonify([{'fio': person[0], 'position': person[1], 'photo_path': person[2], 'proxy_path': person[3]} for person in people])

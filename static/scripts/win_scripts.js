@@ -35,3 +35,9 @@ function selectPerson(person, objectNumber) {
     document.getElementById(`proxy_path${objectNumber}`).value = person.proxy_path;
     closeModal();
 }
+// Добавляем обработчик события keydown для закрытия модального окна по клавише ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === "Escape") {
+        closeModal();
+    }
+});
