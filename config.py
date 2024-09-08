@@ -7,7 +7,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 
 ##### FOR TEST #####
-EXCEL_FILE = 'data/data.xlsx'
-UPLOAD_FOLDER  = 'data/uploads'
-PROXY_FOLDER = 'data/proxy'
-BACKREMOVE_DELETED_PATH = 'data/deleted'
+EXCEL_FILE = '!TEST/data.xlsx'
+UPLOAD_FOLDER  = '!TEST'
+PROXY_FOLDER = '!TEST/AVATARS'
+BACKREMOVE_DELETED_PATH = '!TEST/DELETED'

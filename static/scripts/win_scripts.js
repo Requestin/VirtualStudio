@@ -21,6 +21,9 @@ function openModal(objectNumber) {
                     li.style.display = text.includes(searchTerm) ? '' : 'none';
                 });
             });
+
+            // Очищаем поле поиска
+            searchInput.value = '';
         });
 }
 
