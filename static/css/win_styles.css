@@ -25,11 +25,13 @@
 }
 .modal-content {
     background-color: #fefefe;
-    margin: 5% auto;
+    margin: 50% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
 }
+
+
 .close {
     color: #aaa;
     float: right;
@@ -89,6 +91,7 @@
 }
 
 body {
+    background-color: rgb(0, 35, 75);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -134,20 +137,19 @@ h1, h2 {
 
 .button:hover {
     background-color: rgb(0, 35, 75); /* Темно-зеленый цвет при наведении */
-
 }
 
 .back-button {
     position: fixed;
-    top: 20px;
+    top: 10px;
     left: 20px;
     background-color: rgb(0, 75, 50);
     color: white;
-    padding: 10px 20px;
+    padding: 20px 40px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 24px;
     transition: background-color 0.3s, transform 0.1s;
     text-decoration: none;
     display: inline-block;
@@ -284,6 +286,8 @@ td:last-child, th:last-child {
 #personList {
     list-style-type: none;
     padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 #personList li {
@@ -294,7 +298,6 @@ td:last-child, th:last-child {
 #personList li:hover {
     background-color: #f1f1f1;
 }
-
 @media screen and (max-width: 600px) {
     .container {
         width: 95%;

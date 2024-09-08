@@ -11,6 +11,19 @@ function openModal(objectNumber) {
                 li.onclick = () => selectPerson(person, objectNumber);
                 personList.appendChild(li);
             });
+            
+            // Добавляем функциональность поиска
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                Array.from(personList.children).forEach(li => {
+                    const text = li.textContent.toLowerCase();
+                    li.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+            });
+
+            // Очищаем поле поиска
+            searchInput.value = '';
         });
 }
 
@@ -25,3 +38,9 @@ function selectPerson(person, objectNumber) {
     document.getElementById(`proxy_path${objectNumber}`).value = person.proxy_path;
     closeModal();
 }
+// Добавляем обработчик события keydown для закрытия модального окна по клавише ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === "Escape") {
+        closeModal();
+    }
+});

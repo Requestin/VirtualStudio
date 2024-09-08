@@ -7,13 +7,11 @@
     <link rel="stylesheet" href="static/css/index_styles.css">
 </head>
 <body>
-    <a href="#new_person_to_db" onclick="document.getElementById('modal').style.display='block'">
-        <button class="add-person-btn">Добавить человека в БД</button>
-    </a>
+    <a href="{{ url_for('backremove') }}"> <button class="add-person-btn">Добавить человека в БД</button></a>
 
     <div class="container">
         <h1 class="main-title">Выберите модуль для работы</h1><br><br>
-        
+
         <div class="module-block">
             <h2 class="main-title">Тройные портреты</h2><br>
             <a href="{{ url_for('module_3win_v1') }}"><button class="module-button">Тройные портреты 1</button></a>
@@ -34,6 +32,8 @@
             <a href="{{ url_for('module_1win_v2') }}"><button class="module-button">Одиночный портрет 2</button></a>
             <a href="{{ url_for('module_1win_v3') }}"><button class="module-button">Одиночный портрет 3</button></a>
         </div>
+
+
     </div>
 
     <!-- Модальное окно для добавления человека -->

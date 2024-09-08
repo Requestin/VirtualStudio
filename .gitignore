@@ -1,6 +1,9 @@
 /venv
 /__pycache__
+/!TEST
 /data/proxy/*
 /data/uploads/*
+/data/deleted/*
 /data/data.xlsx
 avid.db
+excel.py
