@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import config
 from PIL import Image
+import unicodedata
 
 
 def create_excel(channel_key=None):
@@ -144,6 +145,33 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
 
 
+def normalize_text(text):
+    """
+    Нормализует текст в формате Unicode для корректного отображения символов Й и Ё.
+    Особое внимание уделяется обработке составных символов, таких как Й и Ё, 
+    которые могут быть представлены как основная буква + диакритический знак.
+    """
+    if not isinstance(text, str):
+        return text
+        
+    # Таблица замены для проблемных символов
+    replacements = {
+        'Й': 'Й',  # Замена составного символа на предкомпозиционный
+        'й': 'й',
+        'Ё': 'Ё',
+        'ё': 'ё',
+    }
+    
+    # Заменяем известные проблемные символы
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+    
+    # Применяем композиционную нормализацию (NFC)
+    text = unicodedata.normalize('NFC', text)
+    
+    return text
+
+
 def update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel):
     # Получаем путь к Excel-файлу для выбранного телеканала
     if channel in config.CHANNELS:
@@ -151,6 +179,10 @@ def update_excel(module_name, fio, position, filepath, proxy_filepath, i, channe
     else:
         print(f"Ошибка: канал {channel} не найден")
         return
+    
+    # Применяем нормализацию к текстовым данным
+    fio = normalize_text(fio)
+    position = normalize_text(position)
     
     df = pd.read_excel(excel_file)
     fio_col = f'{module_name} ФИО {i}'
@@ -163,7 +195,8 @@ def update_excel(module_name, fio, position, filepath, proxy_filepath, i, channe
     df.at[0, path_col] = filepath
     df.at[0, avatar_col] = proxy_filepath
 
-    df.to_excel(excel_file, index = False)
+    # Сохраняем с указанием кодировки utf-8
+    df.to_excel(excel_file, index=False)
 
 
 def convert_for_avatar(input_path, output_path, size=(300, 375), max_kb=100, bg_color=(0, 37, 76)):
@@ -181,4 +214,14 @@ def convert_for_avatar(input_path, output_path, size=(300, 375), max_kb=100, bg_
         while os.path.getsize(output_path) > max_kb * 1024:  # Проверяем размер файла и корректируем качество
             quality = max(1, int(95 * (max_kb * 1024) / os.path.getsize(output_path)))  # Вычисляем новое качество
             img.save(output_path, format='JPEG', quality=quality)  # Сохраняем изображение с новым качеством
+
+
+def normalize_excel_data(df):
+    """
+    Нормализует все текстовые данные в DataFrame, загруженном из Excel
+    """
+    for column in df.columns:
+        if df[column].dtype == 'object':  # Проверяем, что столбец содержит строки
+            df[column] = df[column].apply(lambda x: normalize_text(x) if isinstance(x, str) else x)
+    return df
 

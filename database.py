@@ -1,4 +1,14 @@
 import sqlite3 as sql
+import unicodedata
+
+def normalize_text(text):
+    """
+    Нормализует текст в формате Unicode для корректного отображения символов Й и Ё
+    """
+    if isinstance(text, str):
+        # Применяем композиционную нормализацию (NFC) для объединения диакритических знаков с их базовыми символами
+        return unicodedata.normalize('NFC', text)
+    return text
 
 def db_connect():
     global db, cursor
@@ -11,6 +21,10 @@ def db_add_new_person(fio, position, file_path, proxy_path):
     db = sql.connect('avid.db')
     cursor = db.cursor()
     try:
+        # Нормализуем текстовые данные перед сохранением
+        fio = normalize_text(fio)
+        position = normalize_text(position)
+        
         cursor.execute('INSERT INTO virt (fio, position, photo, avatar) VALUES (?, ?, ?, ?)', (fio, position, file_path, proxy_path))
         db.commit()
         print('Данные успешно добавлены в базу данных')

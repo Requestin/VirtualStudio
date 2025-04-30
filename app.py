@@ -3,6 +3,8 @@ from gradio_client import Client, handle_file
 from PIL import Image, ImageDraw, ImageFont
 import io, base64, tempfile, time, shutil, os, sqlite3, pandas as pd
 import services, config, database as db
+from database import normalize_text
+from services import normalize_excel_data
 
 app = Flask(__name__)
 client = Client("not-lain/background-removal")
@@ -75,8 +77,8 @@ def delete_person_page():
 @app.route('/add_person', methods=['GET', 'POST'])
 def add_person():
     if request.method == 'POST':
-        fio = request.form['fio']
-        position = request.form['position']
+        fio = normalize_text(request.form['fio'])
+        position = normalize_text(request.form['position'])
         file = request.files['photo']
 
         if fio and position and file and services.allowed_file(file.filename):
@@ -101,8 +103,8 @@ def module_1win_v1(channel):
     module_name = '1win_v1'
     if request.method == 'POST':
         for i in range(1, 2):
-            fio = request.form[f'fio{i}']
-            position = request.form[f'position{i}']
+            fio = normalize_text(request.form[f'fio{i}'])
+            position = normalize_text(request.form[f'position{i}'])
             filepath = request.form[f'photo_path{i}']
             proxy_filepath = request.form[f'proxy_path{i}']
 
@@ -110,7 +112,10 @@ def module_1win_v1(channel):
                 services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
     excel_file = config.CHANNELS[channel]['excel']
-    data = pd.read_excel(excel_file).to_dict('list')
+    df = pd.read_excel(excel_file)
+    # Нормализуем данные из Excel
+    df = normalize_excel_data(df)
+    data = df.to_dict('list')
     channel_name = config.CHANNELS[channel]['name']
     return render_template('1win_v1.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
@@ -123,8 +128,8 @@ def module_1win_v2(channel):
     module_name = '1win_v2'
     if request.method == 'POST':
         for i in range(1, 2):
-            fio = request.form[f'fio{i}']
-            position = request.form[f'position{i}']
+            fio = normalize_text(request.form[f'fio{i}'])
+            position = normalize_text(request.form[f'position{i}'])
             filepath = request.form[f'photo_path{i}']
             proxy_filepath = request.form[f'proxy_path{i}']
 
@@ -132,7 +137,10 @@ def module_1win_v2(channel):
                 services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
     excel_file = config.CHANNELS[channel]['excel']
-    data = pd.read_excel(excel_file).to_dict('list')
+    df = pd.read_excel(excel_file)
+    # Нормализуем данные из Excel
+    df = normalize_excel_data(df)
+    data = df.to_dict('list')
     channel_name = config.CHANNELS[channel]['name']
     return render_template('1win_v2.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
@@ -144,8 +152,8 @@ def module_1win_v3(channel):
     module_name = '1win_v3'
     if request.method == 'POST':
         for i in range(1, 2):
-            fio = request.form[f'fio{i}']
-            position = request.form[f'position{i}']
+            fio = normalize_text(request.form[f'fio{i}'])
+            position = normalize_text(request.form[f'position{i}'])
             filepath = request.form[f'photo_path{i}']
             proxy_filepath = request.form[f'proxy_path{i}']
 
@@ -153,7 +161,10 @@ def module_1win_v3(channel):
                 services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
     excel_file = config.CHANNELS[channel]['excel']
-    data = pd.read_excel(excel_file).to_dict('list')
+    df = pd.read_excel(excel_file)
+    # Нормализуем данные из Excel
+    df = normalize_excel_data(df)
+    data = df.to_dict('list')
     channel_name = config.CHANNELS[channel]['name']
     return render_template('1win_v3.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
@@ -166,8 +177,8 @@ def module_2win_v1(channel):
     module_name = '2win_v1'
     if request.method == 'POST':
         for i in range(1, 3):
-            fio = request.form[f'fio{i}']
-            position = request.form[f'position{i}']
+            fio = normalize_text(request.form[f'fio{i}'])
+            position = normalize_text(request.form[f'position{i}'])
             filepath = request.form[f'photo_path{i}']
             proxy_filepath = request.form[f'proxy_path{i}']
 
@@ -175,7 +186,10 @@ def module_2win_v1(channel):
                 services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
     excel_file = config.CHANNELS[channel]['excel']
-    data = pd.read_excel(excel_file).to_dict('list')
+    df = pd.read_excel(excel_file)
+    # Нормализуем данные из Excel
+    df = normalize_excel_data(df)
+    data = df.to_dict('list')
     channel_name = config.CHANNELS[channel]['name']
     return render_template('2win_v1.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
@@ -188,8 +202,8 @@ def module_2win_v2(channel):
     module_name = '2win_v2'
     if request.method == 'POST':
         for i in range(1, 3):
-            fio = request.form[f'fio{i}']
-            position = request.form[f'position{i}']
+            fio = normalize_text(request.form[f'fio{i}'])
+            position = normalize_text(request.form[f'position{i}'])
             filepath = request.form[f'photo_path{i}']
             proxy_filepath = request.form[f'proxy_path{i}']
 
@@ -197,7 +211,10 @@ def module_2win_v2(channel):
                 services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
     excel_file = config.CHANNELS[channel]['excel']
-    data = pd.read_excel(excel_file).to_dict('list')
+    df = pd.read_excel(excel_file)
+    # Нормализуем данные из Excel
+    df = normalize_excel_data(df)
+    data = df.to_dict('list')
     channel_name = config.CHANNELS[channel]['name']
     return render_template('2win_v2.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
@@ -210,8 +227,8 @@ def module_2win_v3(channel):
     module_name = '2win_v3'
     if request.method == 'POST':
         for i in range(1, 3):
-            fio = request.form[f'fio{i}']
-            position = request.form[f'position{i}']
+            fio = normalize_text(request.form[f'fio{i}'])
+            position = normalize_text(request.form[f'position{i}'])
             filepath = request.form[f'photo_path{i}']
             proxy_filepath = request.form[f'proxy_path{i}']
 
@@ -219,7 +236,10 @@ def module_2win_v3(channel):
                 services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
     excel_file = config.CHANNELS[channel]['excel']
-    data = pd.read_excel(excel_file).to_dict('list')
+    df = pd.read_excel(excel_file)
+    # Нормализуем данные из Excel
+    df = normalize_excel_data(df)
+    data = df.to_dict('list')
     channel_name = config.CHANNELS[channel]['name']
     return render_template('2win_v3.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
@@ -232,8 +252,8 @@ def module_3win_v1(channel):
     module_name = '3win_v1'
     if request.method == 'POST':
         for i in range(1, 4):
-            fio = request.form[f'fio{i}']
-            position = request.form[f'position{i}']
+            fio = normalize_text(request.form[f'fio{i}'])
+            position = normalize_text(request.form[f'position{i}'])
             filepath = request.form[f'photo_path{i}']
             proxy_filepath = request.form[f'proxy_path{i}']
 
@@ -241,7 +261,10 @@ def module_3win_v1(channel):
                 services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
     excel_file = config.CHANNELS[channel]['excel']
-    data = pd.read_excel(excel_file).to_dict('list')
+    df = pd.read_excel(excel_file)
+    # Нормализуем данные из Excel
+    df = normalize_excel_data(df)
+    data = df.to_dict('list')
     channel_name = config.CHANNELS[channel]['name']
     return render_template('3win_v1.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
@@ -254,8 +277,8 @@ def module_3win_v2(channel):
     module_name = '3win_v2'
     if request.method == 'POST':
         for i in range(1, 4):
-            fio = request.form[f'fio{i}']
-            position = request.form[f'position{i}']
+            fio = normalize_text(request.form[f'fio{i}'])
+            position = normalize_text(request.form[f'position{i}'])
             filepath = request.form[f'photo_path{i}']
             proxy_filepath = request.form[f'proxy_path{i}']
 
@@ -263,7 +286,10 @@ def module_3win_v2(channel):
                 services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
     excel_file = config.CHANNELS[channel]['excel']
-    data = pd.read_excel(excel_file).to_dict('list')
+    df = pd.read_excel(excel_file)
+    # Нормализуем данные из Excel
+    df = normalize_excel_data(df)
+    data = df.to_dict('list')
     channel_name = config.CHANNELS[channel]['name']
     return render_template('3win_v2.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
@@ -276,8 +302,8 @@ def module_3win_v3(channel):
     module_name = '3win_v3'
     if request.method == 'POST':
         for i in range(1, 4):
-            fio = request.form[f'fio{i}']
-            position = request.form[f'position{i}']
+            fio = normalize_text(request.form[f'fio{i}'])
+            position = normalize_text(request.form[f'position{i}'])
             filepath = request.form[f'photo_path{i}']
             proxy_filepath = request.form[f'proxy_path{i}']
 
@@ -285,7 +311,10 @@ def module_3win_v3(channel):
                 services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
     excel_file = config.CHANNELS[channel]['excel']
-    data = pd.read_excel(excel_file).to_dict('list')
+    df = pd.read_excel(excel_file)
+    # Нормализуем данные из Excel
+    df = normalize_excel_data(df)
+    data = df.to_dict('list')
     channel_name = config.CHANNELS[channel]['name']
     return render_template('3win_v3.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
@@ -308,10 +337,10 @@ def save_image():
         return jsonify({'success': False, 'error': 'No image data'}), 400
     # Декодируем данные изображения из base64
     image_data = base64.b64decode(request.json['image'].split(',')[1])
-    # Получаем имя из данных запроса
-    name = request.json['name']
-    # Получаем должность из данных запроса
-    position = request.json['position']
+    # Получаем имя из данных запроса и нормализуем
+    name = normalize_text(request.json['name'])
+    # Получаем должность из данных запроса и нормализуем
+    position = normalize_text(request.json['position'])
     # Создаем объект изображения из полученных данных
     img = Image.open(io.BytesIO(image_data))
     
@@ -428,8 +457,8 @@ def get_image(filename):
 def continue_processing():
     data = request.json
     file_path = data.get('file_path')
-    name = data.get('name')
-    position = data.get('position')
+    name = normalize_text(data.get('name'))
+    position = normalize_text(data.get('position'))
 
     try:
         if not os.path.exists(file_path):
