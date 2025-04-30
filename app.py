@@ -7,7 +7,6 @@ import services, config, database as db
 app = Flask(__name__)
 client = Client("not-lain/background-removal")
 
-EXCEL_FILE = config.EXCEL_FILE
 UPLOAD_FOLDER = config.UPLOAD_FOLDER
 PROXY_FOLDER = config.PROXY_FOLDER
 BACKREMOVE_DELETED_PATH = config.BACKREMOVE_DELETED_PATH
@@ -15,6 +14,14 @@ BACKREMOVE_DELETED_PATH = config.BACKREMOVE_DELETED_PATH
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/channel/<channel>')
+def channel_modules(channel):
+    if channel in config.CHANNELS:
+        channel_name = config.CHANNELS[channel]['name']
+        return render_template('channel_modules.html', channel=channel, channel_name=channel_name)
+    else:
+        return redirect(url_for('index'))
 
 @app.route('/backremove')
 def backremove():
@@ -42,8 +49,11 @@ def add_person():
         return "Ошибка добавления данных"
 
 
-@app.route('/1win_v1', methods=['GET', 'POST'])
-def module_1win_v1():
+@app.route('/<channel>/1win_v1', methods=['GET', 'POST'])
+def module_1win_v1(channel):
+    if channel not in config.CHANNELS:
+        return redirect(url_for('index'))
+        
     module_name = '1win_v1'
     if request.method == 'POST':
         for i in range(1, 2):
@@ -53,14 +63,19 @@ def module_1win_v1():
             proxy_filepath = request.form[f'proxy_path{i}']
 
             if fio and position and filepath and proxy_filepath:
-                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
-    data = pd.read_excel(EXCEL_FILE).to_dict('list')
-    return render_template('1win_v1.html', data=data, module_name=module_name)
+    excel_file = config.CHANNELS[channel]['excel']
+    data = pd.read_excel(excel_file).to_dict('list')
+    channel_name = config.CHANNELS[channel]['name']
+    return render_template('1win_v1.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
 
-@app.route('/1win_v2', methods=['GET', 'POST'])
-def module_1win_v2():
+@app.route('/<channel>/1win_v2', methods=['GET', 'POST'])
+def module_1win_v2(channel):
+    if channel not in config.CHANNELS:
+        return redirect(url_for('index'))
+        
     module_name = '1win_v2'
     if request.method == 'POST':
         for i in range(1, 2):
@@ -70,13 +85,18 @@ def module_1win_v2():
             proxy_filepath = request.form[f'proxy_path{i}']
 
             if fio and position and filepath and proxy_filepath:
-                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
-    data = pd.read_excel(EXCEL_FILE).to_dict('list')
-    return render_template('1win_v2.html', data=data, module_name=module_name)
+    excel_file = config.CHANNELS[channel]['excel']
+    data = pd.read_excel(excel_file).to_dict('list')
+    channel_name = config.CHANNELS[channel]['name']
+    return render_template('1win_v2.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
-@app.route('/1win_v3', methods=['GET', 'POST'])
-def module_1win_v3():
+@app.route('/<channel>/1win_v3', methods=['GET', 'POST'])
+def module_1win_v3(channel):
+    if channel not in config.CHANNELS:
+        return redirect(url_for('index'))
+        
     module_name = '1win_v3'
     if request.method == 'POST':
         for i in range(1, 2):
@@ -86,14 +106,19 @@ def module_1win_v3():
             proxy_filepath = request.form[f'proxy_path{i}']
 
             if fio and position and filepath and proxy_filepath:
-                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
-    data = pd.read_excel(EXCEL_FILE).to_dict('list')
-    return render_template('1win_v3.html', data=data, module_name=module_name)
+    excel_file = config.CHANNELS[channel]['excel']
+    data = pd.read_excel(excel_file).to_dict('list')
+    channel_name = config.CHANNELS[channel]['name']
+    return render_template('1win_v3.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
 
-@app.route('/2win_v1', methods=['GET', 'POST'])
-def module_2win_v1():
+@app.route('/<channel>/2win_v1', methods=['GET', 'POST'])
+def module_2win_v1(channel):
+    if channel not in config.CHANNELS:
+        return redirect(url_for('index'))
+        
     module_name = '2win_v1'
     if request.method == 'POST':
         for i in range(1, 3):
@@ -103,14 +128,19 @@ def module_2win_v1():
             proxy_filepath = request.form[f'proxy_path{i}']
 
             if fio and position and filepath and proxy_filepath:
-                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
-    data = pd.read_excel(EXCEL_FILE).to_dict('list')
-    return render_template('2win_v1.html', data=data, module_name=module_name)
+    excel_file = config.CHANNELS[channel]['excel']
+    data = pd.read_excel(excel_file).to_dict('list')
+    channel_name = config.CHANNELS[channel]['name']
+    return render_template('2win_v1.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
 
-@app.route('/2win_v2', methods=['GET', 'POST'])
-def module_2win_v2():
+@app.route('/<channel>/2win_v2', methods=['GET', 'POST'])
+def module_2win_v2(channel):
+    if channel not in config.CHANNELS:
+        return redirect(url_for('index'))
+        
     module_name = '2win_v2'
     if request.method == 'POST':
         for i in range(1, 3):
@@ -120,14 +150,19 @@ def module_2win_v2():
             proxy_filepath = request.form[f'proxy_path{i}']
 
             if fio and position and filepath and proxy_filepath:
-                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
-    data = pd.read_excel(EXCEL_FILE).to_dict('list')
-    return render_template('2win_v2.html', data=data, module_name=module_name)
+    excel_file = config.CHANNELS[channel]['excel']
+    data = pd.read_excel(excel_file).to_dict('list')
+    channel_name = config.CHANNELS[channel]['name']
+    return render_template('2win_v2.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
 
-@app.route('/2win_v3', methods=['GET', 'POST'])
-def module_2win_v3():
+@app.route('/<channel>/2win_v3', methods=['GET', 'POST'])
+def module_2win_v3(channel):
+    if channel not in config.CHANNELS:
+        return redirect(url_for('index'))
+        
     module_name = '2win_v3'
     if request.method == 'POST':
         for i in range(1, 3):
@@ -137,14 +172,19 @@ def module_2win_v3():
             proxy_filepath = request.form[f'proxy_path{i}']
 
             if fio and position and filepath and proxy_filepath:
-                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
-    data = pd.read_excel(EXCEL_FILE).to_dict('list')
-    return render_template('2win_v3.html', data=data, module_name=module_name)
+    excel_file = config.CHANNELS[channel]['excel']
+    data = pd.read_excel(excel_file).to_dict('list')
+    channel_name = config.CHANNELS[channel]['name']
+    return render_template('2win_v3.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
 
-@app.route('/3win_v1', methods=['GET', 'POST'])
-def module_3win_v1():
+@app.route('/<channel>/3win_v1', methods=['GET', 'POST'])
+def module_3win_v1(channel):
+    if channel not in config.CHANNELS:
+        return redirect(url_for('index'))
+        
     module_name = '3win_v1'
     if request.method == 'POST':
         for i in range(1, 4):
@@ -154,14 +194,19 @@ def module_3win_v1():
             proxy_filepath = request.form[f'proxy_path{i}']
 
             if fio and position and filepath and proxy_filepath:
-                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
-    data = pd.read_excel(EXCEL_FILE).to_dict('list')
-    return render_template('3win_v1.html', data=data, module_name=module_name)
+    excel_file = config.CHANNELS[channel]['excel']
+    data = pd.read_excel(excel_file).to_dict('list')
+    channel_name = config.CHANNELS[channel]['name']
+    return render_template('3win_v1.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
 
-@app.route('/3win_v2', methods=['GET', 'POST'])
-def module_3win_v2():
+@app.route('/<channel>/3win_v2', methods=['GET', 'POST'])
+def module_3win_v2(channel):
+    if channel not in config.CHANNELS:
+        return redirect(url_for('index'))
+        
     module_name = '3win_v2'
     if request.method == 'POST':
         for i in range(1, 4):
@@ -171,14 +216,19 @@ def module_3win_v2():
             proxy_filepath = request.form[f'proxy_path{i}']
 
             if fio and position and filepath and proxy_filepath:
-                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
-    data = pd.read_excel(EXCEL_FILE).to_dict('list')
-    return render_template('3win_v2.html', data=data, module_name=module_name)
+    excel_file = config.CHANNELS[channel]['excel']
+    data = pd.read_excel(excel_file).to_dict('list')
+    channel_name = config.CHANNELS[channel]['name']
+    return render_template('3win_v2.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
 
-@app.route('/3win_v3', methods=['GET', 'POST'])
-def module_3win_v3():
+@app.route('/<channel>/3win_v3', methods=['GET', 'POST'])
+def module_3win_v3(channel):
+    if channel not in config.CHANNELS:
+        return redirect(url_for('index'))
+        
     module_name = '3win_v3'
     if request.method == 'POST':
         for i in range(1, 4):
@@ -188,10 +238,12 @@ def module_3win_v3():
             proxy_filepath = request.form[f'proxy_path{i}']
 
             if fio and position and filepath and proxy_filepath:
-                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i)
+                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
     # Чтение данных из Excel
-    data = pd.read_excel(EXCEL_FILE).to_dict('list')
-    return render_template('3win_v3.html', data=data, module_name=module_name)
+    excel_file = config.CHANNELS[channel]['excel']
+    data = pd.read_excel(excel_file).to_dict('list')
+    channel_name = config.CHANNELS[channel]['name']
+    return render_template('3win_v3.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
 
 @app.route('/get_people')
@@ -266,7 +318,6 @@ def save_image():
         # Удаляем временные файлы
         os.remove(temp_file_path)
         os.remove(output_image_path)
-        # os.remove(proxy_filepath)
         
         # Возвращаем успешный ответ с путем к сохраненному файлу
         return jsonify({'success': True, 'file_path': final_file_path})
@@ -356,5 +407,6 @@ def continue_processing():
 
 if __name__ == '__main__':
     db.db_connect()
+    # Создаем Excel-файлы для обоих каналов, если они не существуют
     services.create_excel()
     app.run(debug=True, port=5700)
