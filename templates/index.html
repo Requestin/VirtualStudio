@@ -7,7 +7,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index_styles.css') }}">
 </head>
 <body>
-    <a href="{{ url_for('backremove') }}"><button class="add-person-btn">Добавить человека в БД</button></a>
+    <div class="controls">
+        <a href="{{ url_for('backremove') }}"><button class="action-btn add-person-btn">Добавить человека в БД</button></a>
+        <a href="{{ url_for('delete_person_page') }}"><button class="action-btn delete-person-btn">Удалить из БД</button></a>
+    </div>
 
     <div class="container">
         <h1 class="main-title">Выберите телеканал для работы</h1><br><br>

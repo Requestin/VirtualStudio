@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Удаление из базы данных</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/delete_person.css') }}">
+</head>
+<body>
+    <a href="{{ url_for('index') }}" class="back-button">← Назад</a>
+    
+    <div class="container">
+        <h1>Удаление людей из базы данных</h1>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Поиск по ФИО или должности...">
+        </div>
+        
+        <div class="people-list" id="peopleList">
+            <!-- Записи будут загружены из JavaScript -->
+            <div class="loading">Загрузка...</div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно подтверждения -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h2>Подтверждение удаления</h2>
+            <p>Вы действительно хотите удалить <span id="personName"></span> из базы данных?</p>
+            <p class="warning">Внимание! Это действие нельзя отменить. Все данные и файлы будут удалены.</p>
+            <div class="modal-buttons">
+                <button id="cancelButton">Отмена</button>
+                <button id="confirmButton">Удалить</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Уведомление -->
+    <div id="notification" class="notification">
+        <span id="notificationText"></span>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const peopleList = document.getElementById('peopleList');
+            const searchInput = document.getElementById('searchInput');
+            const confirmModal = document.getElementById('confirmModal');
+            const personNameSpan = document.getElementById('personName');
+            const cancelButton = document.getElementById('cancelButton');
+            const confirmButton = document.getElementById('confirmButton');
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            let allPeople = [];
+            let selectedPersonId = null;
+            
+            // Загрузка списка людей
+            fetchPeople();
+            
+            // Обработчик поиска
+            searchInput.addEventListener('input', filterPeople);
+            
+            // Обработчики для модального окна
+            cancelButton.addEventListener('click', closeModal);
+            confirmButton.addEventListener('click', deletePerson);
+            
+            // Функция загрузки списка людей
+            function fetchPeople() {
+                fetch('/get_people')
+                    .then(response => response.json())
+                    .then(data => {
+                        allPeople = data;
+                        renderPeopleList(allPeople);
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при загрузке данных:', error);
+                        peopleList.innerHTML = '<div class="error">Ошибка загрузки данных</div>';
+                    });
+            }
+            
+            // Функция отображения списка людей
+            function renderPeopleList(people) {
+                if (people.length === 0) {
+                    peopleList.innerHTML = '<div class="no-results">Нет результатов</div>';
+                    return;
+                }
+                
+                peopleList.innerHTML = '';
+                
+                people.forEach(person => {
+                    const personCard = document.createElement('div');
+                    personCard.className = 'person-card';
+                    
+                    const avatar = document.createElement('div');
+                    avatar.className = 'person-avatar';
+                    if (person.proxy_path) {
+                        const img = document.createElement('img');
+                        img.src = `/get_image/${encodeURIComponent(person.proxy_path)}`;
+                        img.alt = person.fio;
+                        img.onerror = function() {
+                            this.src = '/static/images/no_avatar.png';
+                        };
+                        avatar.appendChild(img);
+                    } else {
+                        avatar.textContent = '?';
+                    }
+                    
+                    const info = document.createElement('div');
+                    info.className = 'person-info';
+                    
+                    const name = document.createElement('div');
+                    name.className = 'person-name';
+                    name.textContent = person.fio;
+                    
+                    const position = document.createElement('div');
+                    position.className = 'person-position';
+                    position.textContent = person.position;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.textContent = 'Удалить';
+                    deleteBtn.dataset.id = person.id;
+                    deleteBtn.dataset.name = person.fio;
+                    deleteBtn.addEventListener('click', openConfirmModal);
+                    
+                    info.appendChild(name);
+                    info.appendChild(position);
+                    
+                    personCard.appendChild(avatar);
+                    personCard.appendChild(info);
+                    personCard.appendChild(deleteBtn);
+                    
+                    peopleList.appendChild(personCard);
+                });
+            }
+            
+            // Функция фильтрации по поиску
+            function filterPeople() {
+                const searchTerm = searchInput.value.toLowerCase();
+                
+                if (!searchTerm) {
+                    renderPeopleList(allPeople);
+                    return;
+                }
+                
+                const filtered = allPeople.filter(person => 
+                    person.fio.toLowerCase().includes(searchTerm) || 
+                    person.position.toLowerCase().includes(searchTerm)
+                );
+                
+                renderPeopleList(filtered);
+            }
+            
+            // Открытие модального окна подтверждения
+            function openConfirmModal(event) {
+                const personId = event.target.dataset.id;
+                const personName = event.target.dataset.name;
+                
+                selectedPersonId = personId;
+                personNameSpan.textContent = personName;
+                confirmModal.style.display = 'flex';
+            }
+            
+            // Закрытие модального окна
+            function closeModal() {
+                confirmModal.style.display = 'none';
+            }
+            
+            // Удаление человека
+            function deletePerson() {
+                if (!selectedPersonId) return;
+                
+                fetch('/api/delete_person', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: selectedPersonId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    closeModal();
+                    
+                    if (data.success) {
+                        showNotification('Человек успешно удален из базы данных');
+                        // Обновляем список после удаления
+                        fetchPeople();
+                    } else {
+                        showNotification('Ошибка: ' + (data.error || 'Не удалось удалить человека'));
+                    }
+                })
+                .catch(error => {
+                    closeModal();
+                    showNotification('Ошибка: ' + error.message);
+                });
+            }
+            
+            // Показ уведомления
+            function showNotification(message) {
+                notificationText.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -151,6 +151,17 @@ body {
         font-size: 18px;
         min-width: 200px;
     }
+    
+    .controls {
+        width: auto;
+        margin-right: 20px;
+    }
+    
+    .action-btn {
+        width: 250px;
+        padding: 12px 25px;
+        font-size: 18px;
+    }
 }
 
 @media screen and (max-width: 768px) {
@@ -176,6 +187,27 @@ body {
     .main-title {
         font-size: 24px;
         padding: 12px 24px;
+    }
+    
+    .controls {
+        flex-direction: row;
+        top: auto;
+        bottom: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        gap: 10px;
+        margin-right: 0;
+    }
+    
+    .action-btn {
+        padding: 12px 20px;
+        font-size: 16px;
+        width: auto;
+    }
+    
+    .back-button {
+        padding: 10px 20px;
+        font-size: 16px;
     }
 }
 
@@ -204,4 +236,58 @@ body {
     .channel-title {
         font-size: 28px;
     }
+    
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-btn {
+        width: 100%;
+        max-width: 250px;
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+}
+
+.controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 100;
+}
+
+.action-btn {
+    padding: 15px 30px;
+    background-color: rgb(0, 75, 50);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    width: 280px;
+    text-align: center;
+}
+
+.action-btn:hover {
+    background-color: rgb(0, 35, 75);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.add-person-btn {
+    background-color: rgb(0, 75, 50);
+}
+
+.delete-person-btn {
+    background-color: #e74c3c;
+}
+
+.delete-person-btn:hover {
+    background-color: #c0392b;
 } 

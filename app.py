@@ -27,6 +27,9 @@ def channel_modules(channel):
 def backremove():
     return render_template('backremove.html')
 
+@app.route('/delete_person')
+def delete_person_page():
+    return render_template('delete_person.html')
 
 @app.route('/add_person', methods=['GET', 'POST'])
 def add_person():
@@ -250,10 +253,10 @@ def module_3win_v3(channel):
 def get_people():
     conn = sqlite3.connect('avid.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT fio, position, photo, avatar FROM virt ORDER BY fio COLLATE NOCASE")
+    cursor.execute("SELECT id, fio, position, photo, avatar FROM virt ORDER BY fio COLLATE NOCASE")
     people = cursor.fetchall()
     conn.close()
-    return jsonify([{'fio': person[0], 'position': person[1], 'photo_path': person[2], 'proxy_path': person[3]} for person in people])
+    return jsonify([{'id': person[0], 'fio': person[1], 'position': person[2], 'photo_path': person[3], 'proxy_path': person[4]} for person in people])
 
 
 @app.route('/save_image', methods=['POST'])
@@ -404,6 +407,47 @@ def continue_processing():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/delete_person', methods=['POST'])
+def delete_person():
+    data = request.json
+    person_id = data.get('id')
+    
+    if not person_id:
+        return jsonify({'success': False, 'error': 'ID не указан'}), 400
+    
+    try:
+        # Получаем информацию о человеке перед удалением
+        conn = sqlite3.connect('avid.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT photo, avatar FROM virt WHERE id = ?", (person_id,))
+        result = cursor.fetchone()
+        
+        if not result:
+            return jsonify({'success': False, 'error': 'Человек не найден'}), 404
+            
+        photo_path, avatar_path = result
+        
+        # Удаляем файлы, если они существуют
+        if photo_path and os.path.exists(photo_path):
+            try:
+                os.remove(photo_path)
+            except:
+                pass
+                
+        if avatar_path and os.path.exists(avatar_path):
+            try:
+                os.remove(avatar_path)
+            except:
+                pass
+        
+        # Удаляем запись из БД
+        cursor.execute("DELETE FROM virt WHERE id = ?", (person_id,))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     db.db_connect()

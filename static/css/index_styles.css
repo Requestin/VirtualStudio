@@ -81,26 +81,46 @@ body {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
-.add-person-btn {
+.controls {
     position: fixed;
     top: 20px;
     right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 100;
+}
+
+.action-btn {
     padding: 15px 30px;
     background-color: rgb(0, 75, 50);
     color: white;
     border: none;
     border-radius: 15px;
     cursor: pointer;
-    font-size: 24px;
-    transition: background-color 0.3s, transform 0.1s;
-    z-index: 100;
+    font-size: 20px;
+    transition: all 0.3s ease;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    width: 280px;
+    text-align: center;
 }
 
-.add-person-btn:hover {
+.action-btn:hover {
     background-color: rgb(0, 35, 75);
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.add-person-btn {
+    background-color: rgb(0, 75, 50);
+}
+
+.delete-person-btn {
+    background-color: rgb(231, 76, 60);
+}
+
+.delete-person-btn:hover {
+    background-color: rgb(105, 29, 20);
 }
 
 /* Стиль для модального окна */
@@ -213,9 +233,19 @@ body {
         padding: 12px 24px;
     }
     
-    .add-person-btn {
-        padding: 12px 24px;
-        font-size: 18px;
+    .controls {
+        flex-direction: row;
+        top: auto;
+        bottom: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        gap: 10px;
+    }
+    
+    .action-btn {
+        padding: 12px 20px;
+        font-size: 16px;
+        width: auto;
     }
 }
 
@@ -235,5 +265,17 @@ body {
     .modal-content {
         width: 90%;
         padding: 20px;
+    }
+    
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-btn {
+        width: 100%;
+        max-width: 250px;
+        padding: 10px 15px;
+        font-size: 14px;
     }
 }
