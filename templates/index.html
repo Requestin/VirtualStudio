@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AVID плагин</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index_styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
 </head>
 <body>
     <div class="controls">
@@ -16,8 +17,18 @@
         <h1 class="main-title">Выберите телеканал для работы</h1><br><br>
 
         <div class="channels-block">
-            <a href="{{ url_for('channel_modules', channel='rentv') }}"><button class="channel-button">Рен-ТВ</button></a>
-            <a href="{{ url_for('channel_modules', channel='5tv') }}"><button class="channel-button">Пятый Канал</button></a>
+            <a href="{{ url_for('channel_modules', channel='rentv') }}">
+                <button class="channel-button">
+                    <img src="{{ url_for('static', filename='images/rentv_logo.png') }}" alt="Рен-ТВ" class="channel-logo">
+                    Рен-ТВ
+                </button>
+            </a>
+            <a href="{{ url_for('channel_modules', channel='5tv') }}">
+                <button class="channel-button">
+                    <img src="{{ url_for('static', filename='images/5tv_logo.png') }}" alt="Пятый Канал" class="channel-logo">
+                    Пятый Канал
+                </button>
+            </a>
         </div>
     </div>
 
