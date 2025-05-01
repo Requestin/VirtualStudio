@@ -1,1 +1,0 @@
-from backremoval.background_removal.app import process_file
