@@ -9,8 +9,8 @@ import sys
 import importlib.util
 
 # Загружаем модуль background-removal/app.py явно через spec
-bg_removal_path = os.path.join(os.path.dirname(__file__), 'background-removal', 'app.py')
-spec = importlib.util.spec_from_file_location("bg_removal_app", bg_removal_path)
+bg_removal_path = os.path.join(os.path.dirname(__file__), 'bg_remove', 'app.py')
+spec = importlib.util.spec_from_file_location("bg_remove_app", bg_removal_path)
 bg_removal_app = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(bg_removal_app)
 # Получаем функцию process из загруженного модуля
