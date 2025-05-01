@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, send_file
-from gradio_client import Client, handle_file
 from PIL import Image, ImageDraw, ImageFont
 import io, base64, tempfile, time, shutil, os, sqlite3, pandas as pd
 import services, config, database as db
 
+# Импортируем локальный обработчик
+from backremoval.background_removal.app import process_file
+
 app = Flask(__name__)
-client = Client("not-lain/background-removal")
 
 UPLOAD_FOLDER = config.UPLOAD_FOLDER
 PROXY_FOLDER = config.PROXY_FOLDER
@@ -302,75 +303,56 @@ def get_people():
 
 @app.route('/save_image', methods=['POST'])
 def save_image():
-    # Проверяем, есть ли данные изображения в запросе
-    if 'image' not in request.json:
-        # Если нет, возвращаем ошибку
-        return jsonify({'success': False, 'error': 'No image data'}), 400
-    # Декодируем данные изображения из base64
-    image_data = base64.b64decode(request.json['image'].split(',')[1])
-    # Получаем имя из данных запроса
-    name = request.json['name']
-    # Получаем должность из данных запроса
-    position = request.json['position']
-    # Создаем объект изображения из полученных данных
-    img = Image.open(io.BytesIO(image_data))
-    
+    data = request.get_json()
+    image_data = data.get('image')
+    name = data.get('name', 'noname')
+    position = data.get('position', 'noposition')
+
     try:
-        # Создаем временный файл
+        # Декодируем base64 изображение и сохраняем во временный файл
+        header, encoded = image_data.split(",", 1)
+        img_bytes = base64.b64decode(encoded)
         with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as temp_file:
-            # Сохраняем изображение во временный файл
-            img.save(temp_file, format='PNG')
-            # Получаем путь к временному файлу
+            temp_file.write(img_bytes)
             temp_file_path = temp_file.name
-        # Отправляем изображение на обработку с повторными попытками
-        max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                # Пытаемся обработать изображение
-                result = client.predict(
-                    image=handle_file(temp_file_path),
-                    api_name="/image"
-                )
-                break  # Если успешно, выходим из цикла
-            except Exception as e:
-                if attempt < max_retries - 1:
-                    time.sleep(2)  # Ждем 2 секунды перед повторной попыткой
-                else:
-                    raise  # Если все попытки не удались, вызываем исключение
-        # Получаем путь к обработанному изображению
-        output_image_path = result[0]
+
+        # Локальная обработка изображения (удаление фона)
+        output_image_path = process_file(temp_file_path)  # Возвращает путь к PNG
+
         # Формируем путь для сохранения финального изображения
         save_path = UPLOAD_FOLDER
-        # Создаем директорию, если она не существует
         if not os.path.exists(save_path):
             os.makedirs(save_path)
-        # Формируем имя файла из введенных данных
         base_filename = f"{name} = {position}.png"
         final_file_path = os.path.join(save_path, base_filename)
+
         # Проверяем, существует ли файл с таким именем
         counter = 1
         while os.path.exists(final_file_path):
-            # Если файл существует, добавляем счетчик к имени
             filename_parts = os.path.splitext(base_filename)
             final_file_path = os.path.join(save_path, f"{filename_parts[0]}_{counter}{filename_parts[1]}")
             counter += 1
-        
-        # Копируем обработанное изображение в финальную папку
+
+        # Открываем обработанное изображение и сохраняем в нужную папку
         with Image.open(output_image_path) as img:
             img.save(final_file_path, "PNG")
 
+        # === СОЗДАЁМ АВАТАР ===
+        avatar_path = os.path.join(PROXY_FOLDER, os.path.splitext(os.path.basename(final_file_path))[0] + ".jpg")
+        services.convert_for_avatar(final_file_path, avatar_path)
+
         # Удаляем временные файлы
-        os.remove(temp_file_path)
-        os.remove(output_image_path)
-        
-        # Возвращаем успешный ответ с путем к сохраненному файлу
-        return jsonify({'success': True, 'file_path': final_file_path})
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+        if os.path.exists(output_image_path):
+            os.remove(output_image_path)
+
+        # Возвращаем успешный ответ с путями к файлам
+        return jsonify({'success': True, 'file_path': final_file_path, 'avatar_path': avatar_path})
     except Exception as e:
-        # В случае ошибки возвращаем информацию об ошибке
         return jsonify({'success': False, 'error': str(e)}), 500
     finally:
-        # Убеждаемся, что временный файл удален в любом случае
-        if 'temp_file_path' in locals():
+        if 'temp_file_path' in locals() and os.path.exists(temp_file_path):
             try:
                 os.remove(temp_file_path)
             except:
@@ -387,7 +369,6 @@ def delete_image():
     try:
         if os.path.exists(file_path):
             # Создаем директорию DELETED, если она не существует
-
             deleted_path = BACKREMOVE_DELETED_PATH
             if not os.path.exists(deleted_path):
                 os.makedirs(deleted_path)
@@ -408,6 +389,16 @@ def delete_image():
             if comment:
                 message += f" Комментарий: {comment}"
             print(message)
+
+            # === УДАЛЯЕМ СООТВЕТСТВУЮЩУЮ АВАТАРКУ ===
+            avatar_path = os.path.join(PROXY_FOLDER, os.path.splitext(os.path.basename(file_path))[0] + ".jpg")
+            if os.path.exists(avatar_path):
+                try:
+                    os.remove(avatar_path)
+                    print(f"Аватарка {avatar_path} удалена.")
+                except Exception as e:
+                    print(f"Ошибка при удалении аватарки: {e}")
+
             return jsonify({'success': True})
         else:
             return jsonify({'success': False, 'error': 'Файл не найден'}), 404
@@ -435,13 +426,8 @@ def continue_processing():
         if not os.path.exists(file_path):
             return jsonify({'success': False, 'error': 'Файл не найден'}), 404
 
-        avatars_path = PROXY_FOLDER
-        if not os.path.exists(avatars_path):
-            os.makedirs(avatars_path)
-
-        avatar_filename = os.path.basename(file_path)
-        avatar_path = os.path.join(avatars_path, avatar_filename)
-        services.convert_for_avatar(file_path, avatar_path)
+        # Формируем путь к уже существующему аватару
+        avatar_path = os.path.join(PROXY_FOLDER, os.path.splitext(os.path.basename(file_path))[0] + ".jpg")
         db.db_add_new_person(name, position, file_path=file_path, proxy_path=avatar_path)
 
         return jsonify({'success': True, 'avatar_path': avatar_path})

@@ -5,15 +5,15 @@
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 # Конфигурация для Рен-ТВ
-RENTV_EXCEL_FILE = '!TEST/rentv_data.xlsx'
+RENTV_EXCEL_FILE = 'G:\!TEST/rentv_data.xlsx'
 
 # Конфигурация для Пятого канала
-FTV_EXCEL_FILE = '!TEST/5tv_data.xlsx'
+FTV_EXCEL_FILE = 'G:\!TEST/5tv_data.xlsx'
 
 # Общая конфигурация
-UPLOAD_FOLDER  = '!TEST'
-PROXY_FOLDER = '!TEST/AVATARS'
-BACKREMOVE_DELETED_PATH = '!TEST/DELETED'
+UPLOAD_FOLDER  = 'G:\!TEST'
+PROXY_FOLDER = 'G:\!TEST/AVATARS'
+BACKREMOVE_DELETED_PATH = 'G:\!TEST/DELETED'
 
 # Сопоставление каналов с их именами и Excel-файлами
 CHANNELS = {
