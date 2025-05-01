@@ -5,9 +5,20 @@ import io, base64, tempfile, time, shutil, os, sqlite3, pandas as pd
 import services, config, database as db
 from database import normalize_text
 from services import normalize_excel_data
+import sys
+import importlib.util
+
+# Загружаем модуль background-removal/app.py явно через spec
+bg_removal_path = os.path.join(os.path.dirname(__file__), 'background-removal', 'app.py')
+spec = importlib.util.spec_from_file_location("bg_removal_app", bg_removal_path)
+bg_removal_app = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(bg_removal_app)
+# Получаем функцию process из загруженного модуля
+process = bg_removal_app.process
 
 app = Flask(__name__)
-client = Client("not-lain/background-removal")
+# Больше не нужен клиент Gradio
+# client = Client("not-lain/background-removal")
 
 UPLOAD_FOLDER = config.UPLOAD_FOLDER
 PROXY_FOLDER = config.PROXY_FOLDER
@@ -345,29 +356,22 @@ def save_image():
     img = Image.open(io.BytesIO(image_data))
     
     try:
-        # Создаем временный файл
+        # Создаем временный файл для исходного изображения
         with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as temp_file:
             # Сохраняем изображение во временный файл
             img.save(temp_file, format='PNG')
             # Получаем путь к временному файлу
             temp_file_path = temp_file.name
-        # Отправляем изображение на обработку с повторными попытками
-        max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                # Пытаемся обработать изображение
-                result = client.predict(
-                    image=handle_file(temp_file_path),
-                    api_name="/image"
-                )
-                break  # Если успешно, выходим из цикла
-            except Exception as e:
-                if attempt < max_retries - 1:
-                    time.sleep(2)  # Ждем 2 секунды перед повторной попыткой
-                else:
-                    raise  # Если все попытки не удались, вызываем исключение
-        # Получаем путь к обработанному изображению
-        output_image_path = result[0]
+        
+        # Открываем изображение и напрямую применяем функцию process для удаления фона
+        input_image = Image.open(temp_file_path).convert("RGB")
+        # Используем импортированную функцию process
+        output_image = process(input_image)
+        
+        # Сохраняем обработанное изображение во временный файл
+        output_image_path = temp_file_path + "_output.png"
+        output_image.save(output_image_path)
+        
         # Формируем путь для сохранения финального изображения
         save_path = UPLOAD_FOLDER
         # Создаем директорию, если она не существует
@@ -385,8 +389,7 @@ def save_image():
             counter += 1
         
         # Копируем обработанное изображение в финальную папку
-        with Image.open(output_image_path) as img:
-            img.save(final_file_path, "PNG")
+        shutil.copy(output_image_path, final_file_path)
 
         # Удаляем временные файлы
         os.remove(temp_file_path)
@@ -402,6 +405,12 @@ def save_image():
         if 'temp_file_path' in locals():
             try:
                 os.remove(temp_file_path)
+            except:
+                pass
+        # Также удаляем временный файл с результатом, если он существует
+        if 'output_image_path' in locals() and os.path.exists(output_image_path):
+            try:
+                os.remove(output_image_path)
             except:
                 pass
 
