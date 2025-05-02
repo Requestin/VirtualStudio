@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import config
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import unicodedata
 
 
@@ -224,4 +224,51 @@ def normalize_excel_data(df):
         if df[column].dtype == 'object':  # Проверяем, что столбец содержит строки
             df[column] = df[column].apply(lambda x: normalize_text(x) if isinstance(x, str) else x)
     return df
+
+
+def create_placeholder_image(text, filename, size=(200, 200), bg_color=(0, 35, 75), text_color=(255, 255, 255)):
+    """
+    Создает изображение-заглушку с заданным текстом и сохраняет его по указанному пути
+    
+    Args:
+        text (str): Текст для отображения на изображении
+        filename (str): Имя файла для сохранения (без пути)
+        size (tuple): Размер изображения в пикселях (ширина, высота)
+        bg_color (tuple): Цвет фона в формате RGB
+        text_color (tuple): Цвет текста в формате RGB
+        
+    Returns:
+        None
+    """
+    img_path = os.path.join('static', 'images', filename)
+    
+    # Не создаем файл, если он уже существует
+    if os.path.exists(img_path):
+        return
+    
+    # Создаем изображение с заданным фоном
+    img = Image.new('RGB', size, color=bg_color)
+    draw = ImageDraw.Draw(img)
+    
+    # Пытаемся использовать шрифт, если он доступен
+    try:
+        font = ImageFont.truetype("arial.ttf", 24)
+    except IOError:
+        # Используем стандартный шрифт, если arial не найден
+        font = ImageFont.load_default()
+    
+    # Вычисляем положение текста для центрирования
+    text_width, text_height = draw.textsize(text, font=font) if hasattr(draw, 'textsize') else (50, 20)
+    position = ((size[0] - text_width) // 2, (size[1] - text_height) // 2)
+    
+    # Рисуем текст
+    draw.text(position, text, fill=text_color, font=font)
+    
+    # Создаем папку images, если она не существует
+    os.makedirs(os.path.dirname(img_path), exist_ok=True)
+    
+    # Сохраняем изображение
+    img.save(img_path)
+
+
 

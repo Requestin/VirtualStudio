@@ -8,10 +8,16 @@ from torchvision import transforms
 
 torch.set_float32_matmul_precision(["high", "highest"][0])
 
+# Выбор устройства: CPU или CUDA
+# Для использования CUDA раскомментируйте следующую строку и закомментируйте строку с 'cpu'
+# DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cpu"
+
 birefnet = AutoModelForImageSegmentation.from_pretrained(
     "ZhengPeng7/BiRefNet", trust_remote_code=True
 )
-birefnet.to("cuda")
+# birefnet.to("cuda") # Старая версия с жестко заданным CUDA
+birefnet.to(DEVICE)
 
 transform_image = transforms.Compose(
     [
@@ -28,10 +34,12 @@ def fn(image):
     processed_image = process(im)
     return (processed_image, origin)
 
-@spaces.GPU
+# Декоратор @spaces.GPU можно удалить при работе на CPU
+# @spaces.GPU
 def process(image):
     image_size = image.size
-    input_images = transform_image(image).unsqueeze(0).to("cuda")
+    # input_images = transform_image(image).unsqueeze(0).to("cuda") # Старая версия с жестко заданным CUDA
+    input_images = transform_image(image).unsqueeze(0).to(DEVICE)
     # Prediction
     with torch.no_grad():
         preds = birefnet(input_images)[-1].sigmoid().cpu()
