@@ -33,6 +33,78 @@ def init_placeholder_images():
 # Инициализация заглушек при запуске
 init_placeholder_images()
 
+# Функция для дублирования файла из одного канала в другой
+def duplicate_to_other_channel(file_path):
+    """
+    Дублирует файл из директории одного канала в директорию другого канала,
+    или из общей директории в директории обоих каналов
+    
+    :param file_path: Полный путь к файлу
+    """
+    if not file_path:
+        return
+        
+    try:
+        # Получаем имя файла
+        filename = os.path.basename(file_path)
+        
+        # Определяем папку с файлом
+        file_dir = os.path.dirname(file_path)
+        
+        # Если файл в папке RENTV, копируем в 5TV
+        if 'RENTV' in file_dir:
+            # Определяем тип файла
+            file_type = 'upload'
+            if 'AVATARS' in file_dir:
+                file_type = 'proxy'
+            elif 'DELETED' in file_dir:
+                file_type = 'deleted'
+                
+            # Получаем соответствующий путь для 5TV
+            target_dir = config.get_channel_path(file_type, '5tv')
+            if not os.path.exists(target_dir):
+                os.makedirs(target_dir, exist_ok=True)
+            target_path = os.path.join(target_dir, filename)
+            shutil.copy2(file_path, target_path)
+            print(f"Файл скопирован из {file_path} в {target_path}")
+            
+        # Если файл в папке 5TV, копируем в RENTV
+        elif '5TV' in file_dir:
+            # Определяем тип файла
+            file_type = 'upload'
+            if 'AVATARS' in file_dir:
+                file_type = 'proxy'
+            elif 'DELETED' in file_dir:
+                file_type = 'deleted'
+                
+            # Получаем соответствующий путь для RENTV
+            target_dir = config.get_channel_path(file_type, 'rentv')
+            if not os.path.exists(target_dir):
+                os.makedirs(target_dir, exist_ok=True)
+            target_path = os.path.join(target_dir, filename)
+            shutil.copy2(file_path, target_path)
+            print(f"Файл скопирован из {file_path} в {target_path}")
+            
+        # Если файл в общей директории, копируем в директорию 5TV (RENTV уже использует общие директории)
+        else:
+            # Определяем тип файла
+            file_type = 'upload'
+            if 'AVATARS' in file_dir or 'proxy_' in filename:
+                file_type = 'proxy'
+            elif 'DELETED' in file_dir:
+                file_type = 'deleted'
+            
+            # Копируем только в 5TV, так как общие пути уже используются для RENTV
+            # Получаем соответствующий путь для 5TV
+            target_dir = config.get_channel_path(file_type, '5tv')
+            if not os.path.exists(target_dir):
+                os.makedirs(target_dir, exist_ok=True)
+            target_path = os.path.join(target_dir, filename)
+            shutil.copy2(file_path, target_path)
+            print(f"Файл скопирован из {file_path} в {target_path}")
+    except Exception as e:
+        print(f"Ошибка при дублировании файла: {e}")
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -69,6 +141,11 @@ def add_person():
             proxy_filepath = os.path.join(PROXY_FOLDER, proxy_filename)
             services.convert_for_avatar(filepath, proxy_filepath)
             db.db_add_new_person(fio, position, filepath, proxy_filepath)
+            
+            # Дублируем файлы в другой канал
+            duplicate_to_other_channel(filepath)
+            duplicate_to_other_channel(proxy_filepath)
+            
         return redirect(url_for('index'))
     else:
         return "Ошибка добавления данных"
@@ -358,6 +435,9 @@ def save_image():
         
         # Копируем обработанное изображение в финальную папку
         shutil.copy(output_image_path, final_file_path)
+        
+        # Дублируем файл в другой канал
+        duplicate_to_other_channel(final_file_path)
 
         # Удаляем временные файлы
         os.remove(temp_file_path)
@@ -393,8 +473,12 @@ def delete_image():
     try:
         if os.path.exists(file_path):
             # Создаем директорию DELETED, если она не существует
-
-            deleted_path = BACKREMOVE_DELETED_PATH
+            # Определяем канал на основе пути к файлу
+            channel = 'rentv'  # по умолчанию РЕН ТВ
+            if '5TV' in file_path:
+                channel = '5tv'
+                
+            deleted_path = config.get_channel_path('deleted', channel)
             if not os.path.exists(deleted_path):
                 os.makedirs(deleted_path)
             # Формируем путь для перемещения файла
@@ -410,6 +494,38 @@ def delete_image():
             
             # Перемещаем файл в папку DELETED
             shutil.move(file_path, deleted_file_path)
+            
+            # Ищем и удаляем такой же файл из другого канала
+            other_channel = 'rentv' if channel == '5tv' else '5tv'
+            other_channel_path = config.get_channel_path('upload', other_channel)
+            other_channel_file = os.path.join(other_channel_path, base_filename)
+            
+            # Проверяем, существует ли файл в директории другого канала
+            if not os.path.exists(other_channel_file):
+                # Если не в корневой директории, проверяем в директории AVATARS
+                if 'AVATARS' in file_path:
+                    other_channel_path = config.get_channel_path('proxy', other_channel)
+                    other_channel_file = os.path.join(other_channel_path, base_filename)
+                
+            if os.path.exists(other_channel_file):
+                # Перемещаем файл из другого канала в его папку DELETED
+                other_deleted_path = config.get_channel_path('deleted', other_channel)
+                if not os.path.exists(other_deleted_path):
+                    os.makedirs(other_deleted_path, exist_ok=True)
+                
+                other_deleted_file_path = os.path.join(other_deleted_path, base_filename)
+                
+                # Проверяем, существует ли файл с таким именем в папке DELETED другого канала
+                counter = 1
+                while os.path.exists(other_deleted_file_path):
+                    filename_parts = os.path.splitext(base_filename)
+                    other_deleted_file_path = os.path.join(other_deleted_path, f"{filename_parts[0]}_{counter}{filename_parts[1]}")
+                    counter += 1
+                
+                # Перемещаем файл из другого канала
+                shutil.move(other_channel_file, other_deleted_file_path)
+                print(f"Файл из другого канала перемещен в DELETED: {other_deleted_file_path}")
+            
             message = f"Фото перемещено в DELETED: {deleted_file_path}"
             if comment:
                 message += f" Комментарий: {comment}"
@@ -449,6 +565,10 @@ def continue_processing():
         avatar_path = os.path.join(avatars_path, avatar_filename)
         services.convert_for_avatar(file_path, avatar_path)
         db.db_add_new_person(name, position, file_path=file_path, proxy_path=avatar_path)
+        
+        # Дублируем файлы в другой канал
+        duplicate_to_other_channel(file_path)
+        duplicate_to_other_channel(avatar_path)
 
         return jsonify({'success': True, 'avatar_path': avatar_path})
     except Exception as e:
@@ -500,4 +620,23 @@ if __name__ == '__main__':
     db.db_connect()
     # Создаем Excel-файлы для обоих каналов, если они не существуют
     services.create_excel()
+    
+    # Создаем директории для РЕН-ТВ, если они не существуют
+    rentv_dirs = [
+        config.UPLOAD_FOLDER,
+        config.PROXY_FOLDER,
+        config.BACKREMOVE_DELETED_PATH
+    ]
+    
+    for path in rentv_dirs:
+        if not os.path.exists(path):
+            os.makedirs(path, exist_ok=True)
+            print(f"Создана директория для РЕН-ТВ: {path}")
+    
+    # Создаем директории для Пятого канала из CHANNEL_DIRS
+    for path in config.CHANNEL_DIRS['5TV']:
+        if not os.path.exists(path):
+            os.makedirs(path, exist_ok=True)
+            print(f"Создана директория для Пятого канала: {path}")
+    
     app.run(debug=True, port=5700)

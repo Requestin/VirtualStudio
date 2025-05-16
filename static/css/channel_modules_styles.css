@@ -13,6 +13,11 @@ body {
     font-family: Arial, sans-serif;
 }
 
+/* Специальный фон для 5 канала */
+.body-5tv {
+    background-image: url('/static/images/bg_5tv.jpg');
+}
+
 .container {
     width: 80%;
     max-width: 1200px;

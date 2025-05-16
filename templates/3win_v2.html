@@ -7,7 +7,7 @@
         <script src="{{ url_for('static', filename='scripts/win_scripts.js') }}"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/win_styles.css') }}">
     </head>
-<body>
+<body class="body-{{ channel }}">
     <a href="{{ url_for('channel_modules', channel=channel) }}" class="button back-button">Назад</a>
     <div class="container">
         <h1>Тройные портреты 2 - <span class="channel-name">{{ channel_name }}</span></h1>
