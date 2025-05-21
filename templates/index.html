@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVID плагин</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index_styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
+</head>
+<body>
+    <div class="controls">
+        <a href="{{ url_for('backremove') }}"><button class="action-btn add-person-btn">Добавить человека в БД</button></a>
+        <a href="{{ url_for('delete_person_page') }}"><button class="action-btn delete-person-btn">Удалить из БД</button></a>
+    </div>
+
+    <div class="container">
+        <h1 class="main-title">Выберите телеканал для работы</h1><br><br>
+
+        <div class="channels-block">
+            <a href="{{ url_for('channel_modules', channel='rentv') }}">
+                <button class="channel-button">
+                    <img src="{{ url_for('static', filename='images/rentv_logo.png') }}" alt="Рен-ТВ" class="channel-logo">
+                    Рен-ТВ
+                </button>
+            </a>
+            <a href="{{ url_for('channel_modules', channel='5tv') }}">
+                <button class="channel-button">
+                    <img src="{{ url_for('static', filename='images/5tv_logo.png') }}" alt="Пятый Канал" class="channel-logo">
+                    Пятый Канал
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления человека -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <a href="#" class="close" onclick="document.getElementById('modal').style.display='none'">&times;</a>  <!-- Кнопка закрытия модального окна -->
+            <h2 class="modal-title">Добавление человека</h2>
+            <form action="{{ url_for('add_person') }}" method="post" enctype="multipart/form-data">
+                <input type="text" name="fio" placeholder="ФИО" required> <br><br>
+                <input type="text" name="position" placeholder="Должность" required> <br><br>
+                <input type="file" name="photo" accept="image/*" required> <br><br>
+                <button type="submit">Добавить</button>
+            </form>
+        </div>
+    </div>
+                
+</body>
+</html>

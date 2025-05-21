@@ -1,0 +1,292 @@
+body {
+    background-color: rgb(0, 35, 75);
+    background-image: url('/static/images/bg.png');
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    font-family: Arial, sans-serif;
+}
+
+.module-block {
+    background-color: #cccccc13;
+    border: 2px solid #cccccc75;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.module-block h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.module-button {
+    margin: 5px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+    text-align: center;
+    width: 90%;
+    max-width: 1200px;
+}
+
+.main-title {
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 15px 30px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-bottom: 40px;
+    font-size: 32px;
+}
+
+.channels-block {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.channel-button {
+    width: 350px;
+    height: 120px;
+    font-size: 28px;
+    margin: 20px;
+    background-color: rgb(0, 75, 50);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.channel-button:hover {
+    background-color: rgb(0, 35, 75);
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.channel-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin-right: 5px;
+}
+
+.controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 100;
+}
+
+.action-btn {
+    padding: 15px 30px;
+    background-color: rgb(0, 75, 50);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    width: 280px;
+    text-align: center;
+}
+
+.action-btn:hover {
+    background-color: rgb(0, 35, 75);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.add-person-btn {
+    background-color: rgb(0, 75, 50);
+}
+
+.delete-person-btn {
+    background-color: rgb(231, 76, 60);
+}
+
+.delete-person-btn:hover {
+    background-color: rgb(105, 29, 20);
+}
+
+/* Стиль для модального окна */
+.modal {
+    display: none; /* По умолчанию скрыто */
+    position: fixed; /* Остаётся на месте */
+    z-index: 1000; /* Показывается поверх других элементов */
+    left: 0;
+    top: 0;
+    width: 100%; /* Полная ширина */
+    height: 100%; /* Полная высота */
+    overflow: auto; /* Включаем прокрутку */
+    background-color: rgba(0, 0, 0, 0.8); /* Полупрозрачный черный фон */
+}
+
+.modal-title {
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Оформление модального окна */
+.modal-content {
+    background-color: rgba(255, 255, 255, 0.95);
+    margin: 15% auto;
+    padding: 30px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    animation: modalFadeIn 0.3s;
+}
+
+@keyframes modalFadeIn {
+    from {opacity: 0; transform: translateY(-30px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+/* Стиль для кнопки закрытия */
+.close {
+    color: #333;
+    float: right;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close:hover,
+.close:focus {
+    color: rgb(255, 0, 0);
+    text-decoration: none;
+}
+
+.modal form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal form input[type="text"],
+.modal form input[type="file"] {
+    width: 90%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.modal form input[type="text"]:focus,
+.modal form input[type="file"]:focus {
+    outline: none;
+    border-color: rgb(0, 75, 50);
+    box-shadow: 0 0 0 3px rgba(0, 75, 50, 0.25);
+}
+
+.modal form button[type="submit"] {
+    background-color: rgb(0, 75, 50);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s, transform 0.1s;
+    margin-top: 10px;
+}
+
+.modal form button[type="submit"]:hover {
+    background-color: rgb(0, 35, 75);
+    transform: translateY(-2px);
+}
+
+/* Медиа-запросы для адаптивного дизайна */
+@media screen and (max-width: 768px) {
+    .channel-button {
+        width: 280px;
+        height: 100px;
+        font-size: 24px;
+        margin: 15px;
+    }
+    
+    .main-title {
+        font-size: 28px;
+        padding: 12px 24px;
+    }
+    
+    .controls {
+        flex-direction: row;
+        top: auto;
+        bottom: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        gap: 10px;
+    }
+    
+    .action-btn {
+        padding: 12px 20px;
+        font-size: 16px;
+        width: auto;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .channel-button {
+        width: 220px;
+        height: 90px;
+        font-size: 20px;
+        margin: 10px;
+    }
+    
+    .main-title {
+        font-size: 22px;
+        padding: 10px 20px;
+    }
+    
+    .modal-content {
+        width: 90%;
+        padding: 20px;
+    }
+    
+    .controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-btn {
+        width: 100%;
+        max-width: 250px;
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+}
