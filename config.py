@@ -17,7 +17,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 # Конфигурация для Рен-ТВ
 RENTV_EXCEL_FILE = 'Z:\\!TEST\\rentv_data.xlsx'
 # Конфигурация для Пятого канала
-FTV_EXCEL_FILE = 'G\\!TEST\\5tv_data.xlsx'
+FTV_EXCEL_FILE = 'G:\\!TEST\\5tv_data.xlsx'
 
 
 
