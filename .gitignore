@@ -10,3 +10,6 @@ bg_remove/__pycache__
 avid.db
 excel.py
 /LivePortrait/pretrained_weights/*
+/temp_animate
+/temp
+/temp_animate_results

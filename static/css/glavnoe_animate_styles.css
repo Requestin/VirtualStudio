@@ -1,0 +1,338 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: rgb(0, 35, 75);
+    color: white;
+    overflow-x: hidden;
+}
+
+.back-button {
+    position: fixed;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    top: 20px;
+    left: 20px;
+    padding: 15px 30px;
+    border-radius: 8px;
+    background-color: rgb(0, 75, 50);
+    color: white;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    z-index: 999;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.back-button:hover {
+    background-color: rgb(0, 35, 75);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.main-container {
+    padding: 80px 20px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.title {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 40px;
+    color: white;
+}
+
+.preview-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.photo-preview-section, .video-preview-section {
+    text-align: center;
+}
+
+.photo-preview-section h3, .video-preview-section h3 {
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.photo-preview {
+    width: 607px;
+    height: 749px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.photo-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.video-preview {
+    width: 720px;
+    height: 720px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-preview video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: none;
+}
+
+.video-preview video.active {
+    display: block;
+}
+
+.video-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #666;
+    font-size: 18px;
+}
+
+.video-controls {
+    margin-top: 15px;
+}
+
+.control-btn {
+    padding: 12px 24px;
+    background-color: rgb(0, 75, 50);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.control-btn:hover {
+    background-color: rgb(0, 95, 70);
+}
+
+.example-videos-section {
+    margin-bottom: 40px;
+}
+
+.example-videos-section h3 {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.example-videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.example-video-item {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.example-video-item:hover {
+    border-color: rgb(0, 75, 50);
+    transform: scale(1.05);
+}
+
+.example-video-item.selected {
+    border-color: rgb(0, 150, 100);
+    box-shadow: 0 0 10px rgba(0, 150, 100, 0.5);
+}
+
+.example-video-item video {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.example-video-item p {
+    text-align: center;
+    margin: 10px;
+    font-size: 14px;
+}
+
+.action-section {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.action-btn {
+    padding: 15px 40px;
+    background-color: rgb(0, 75, 50);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s;
+    min-width: 200px;
+}
+
+.action-btn:hover:not(:disabled) {
+    background-color: rgb(0, 95, 70);
+    transform: translateY(-2px);
+}
+
+.action-btn:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.delete-btn {
+    background-color: #d32f2f;
+    margin-left: 20px;
+}
+
+.delete-btn:hover {
+    background-color: #b71c1c;
+}
+
+/* Loading overlay */
+#loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.spinner {
+    border: 8px solid rgba(255, 255, 255, 0.3);
+    border-top: 8px solid white;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loading-text {
+    font-size: 24px;
+    color: white;
+    text-align: center;
+}
+
+/* Result modal */
+#result-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 3000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: rgb(0, 35, 75);
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.result-preview {
+    margin-bottom: 30px;
+}
+
+.result-preview video {
+    max-width: 800px;
+    max-height: 600px;
+    border-radius: 8px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Notification */
+#notification {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgb(0, 75, 50);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 4000;
+    font-size: 18px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .preview-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .photo-preview, .video-preview {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        aspect-ratio: 607/749;
+    }
+    
+    .video-preview {
+        aspect-ratio: 1/1;
+    }
+    
+    .example-videos-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+} 

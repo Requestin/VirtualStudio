@@ -8,8 +8,9 @@ UPLOAD_FOLDER = 'G:\\!TEST'
 PROXY_FOLDER = 'G:\\!TEST\\AVATARS'
 BACKREMOVE_DELETED_PATH = 'G:\\!TEST\\DELETED'
 
-# Директории для Пятого канала (5TV)
+# Директории для каналов
 CHANNEL_DIRS = {
+    'RENTV': [UPLOAD_FOLDER, PROXY_FOLDER, BACKREMOVE_DELETED_PATH],
     '5TV': ['Z:\\!TEST', 'Z:\\!TEST\\AVATARS', 'Z:\\!TEST\\DELETED']
 }
 

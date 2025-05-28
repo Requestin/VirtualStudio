@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главное - AVID плагин</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/backremove_styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" type="image/png">
+</head>
+<body>
+    <a href="{{ url_for('index') }}" class="button back-button">Назад</a>
+    <div id="editor-container">
+        <div id="preview-container">
+            <img id="preview-image" src="">
+        </div>
+        <img id="template-overlay" src="/static/images/bg_backremove.png" alt="Шаблон">
+        
+        <div id="name-input-container" class="input-container">
+            <input type="text" id="video-name-input" class="text-input" placeholder="Введите название видео">
+        </div>
+        
+        <div id="upload-btn-container" class="button-container">
+            <input type="file" id="file-input" accept="image/*" style="display: none;">
+            <button id="upload-btn" class="action-btn">Загрузить фото</button>
+        </div>
+        
+        <div id="save-btn-container" class="button-container">
+            <button id="save-btn" class="action-btn" disabled>Сохранить фото</button>
+        </div>
+    </div>
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+    <div id="modal-overlay"></div>
+    <div id="result-modal">
+        <div id="result-image-container">
+            <img id="result-image" src="" alt="Результат">
+        </div>
+        <div id="comment-container">
+            <div id="delete-comment-container">
+                <textarea id="delete-comment" class="text-input" placeholder="Комментарий при удалении (необязательно)"></textarea>
+            </div>
+            <div id="continue-btn-container">
+                <button id="continue-btn" class="action-btn">Продолжить</button>
+            </div>
+            <div id="delete-btn-container">
+                <button id="delete-btn" class="action-btn">Удалить фото</button>
+            </div>
+        </div>
+    </div>
+    <div id="notification"></div>
+
+    <script src="{{ url_for('static', filename='scripts/glavnoe_scripts.js') }}"></script>
+</body>
+</html> 
