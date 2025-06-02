@@ -7,16 +7,28 @@ from database import normalize_text
 from services import normalize_excel_data, create_placeholder_image
 import sys
 import importlib.util
+from logger_config import get_logger
+
+# Инициализация логгеров
+logger = get_logger('VirtualStudio')
+file_logger = get_logger('VirtualStudio.FileOperations')
+db_logger = get_logger('VirtualStudio.Database')
 
 # Загружаем модуль background-removal/app.py явно через spec
 bg_removal_path = os.path.join(os.path.dirname(__file__), 'bg_remove', 'app.py')
 spec = importlib.util.spec_from_file_location("bg_remove_app", bg_removal_path)
 bg_removal_app = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(bg_removal_app)
-# Получаем функцию process из загруженного модуля
-process = bg_removal_app.process
+try:
+    spec.loader.exec_module(bg_removal_app)
+    # Получаем функцию process из загруженного модуля
+    process = bg_removal_app.process
+    logger.info("Модуль удаления фона успешно загружен")
+except Exception as e:
+    logger.error(f"Ошибка загрузки модуля удаления фона: {e}")
+    raise
 
 app = Flask(__name__)
+logger.info("Flask приложение инициализировано")
 # Больше не нужен клиент Gradio
 # client = Client("not-lain/background-removal")
 
@@ -26,9 +38,14 @@ BACKREMOVE_DELETED_PATH = config.BACKREMOVE_DELETED_PATH
 
 # Создаем заглушки при запуске приложения, если их нет
 def init_placeholder_images():
-    create_placeholder_image("Favicon", "favicon.png", size=(32, 32))
-    create_placeholder_image("РЕН ТВ", "rentv_logo.png", size=(100, 100))
-    create_placeholder_image("5 КАНАЛ", "5tv_logo.png", size=(100, 100))
+    logger.info("Инициализация заглушек изображений...")
+    try:
+        create_placeholder_image("Favicon", "favicon.png", size=(32, 32))
+        create_placeholder_image("РЕН ТВ", "rentv_logo.png", size=(100, 100))
+        create_placeholder_image("5 КАНАЛ", "5tv_logo.png", size=(100, 100))
+        logger.info("Заглушки изображений успешно созданы")
+    except Exception as e:
+        logger.error(f"Ошибка создания заглушек изображений: {e}")
 
 # Инициализация заглушек при запуске
 init_placeholder_images()
@@ -44,6 +61,7 @@ def duplicate_to_other_channel(file_path):
     if not file_path:
         return
         
+    file_logger.info(f"Начинаем дублирование файла: {file_path}")
     try:
         # Получаем имя файла
         filename = os.path.basename(file_path)
@@ -66,7 +84,7 @@ def duplicate_to_other_channel(file_path):
                 os.makedirs(target_dir, exist_ok=True)
             target_path = os.path.join(target_dir, filename)
             shutil.copy2(file_path, target_path)
-            print(f"Файл скопирован из {file_path} в {target_path}")
+            file_logger.info(f"Файл скопирован из RENTV в 5TV: {file_path} -> {target_path}")
             
         # Если файл в папке 5TV, копируем в RENTV
         elif '5TV' in file_dir:
@@ -83,7 +101,7 @@ def duplicate_to_other_channel(file_path):
                 os.makedirs(target_dir, exist_ok=True)
             target_path = os.path.join(target_dir, filename)
             shutil.copy2(file_path, target_path)
-            print(f"Файл скопирован из {file_path} в {target_path}")
+            file_logger.info(f"Файл скопирован из 5TV в RENTV: {file_path} -> {target_path}")
             
         # Если файл в общей директории, копируем в директорию 5TV (RENTV уже использует общие директории)
         else:
@@ -101,28 +119,34 @@ def duplicate_to_other_channel(file_path):
                 os.makedirs(target_dir, exist_ok=True)
             target_path = os.path.join(target_dir, filename)
             shutil.copy2(file_path, target_path)
-            print(f"Файл скопирован из {file_path} в {target_path}")
+            file_logger.info(f"Файл скопирован из общей директории в 5TV: {file_path} -> {target_path}")
     except Exception as e:
+        file_logger.error(f"Ошибка при дублировании файла {file_path}: {e}")
         print(f"Ошибка при дублировании файла: {e}")
 
 @app.route('/')
 def index():
+    logger.info("Главная страница - пользователь выбирает телеканал")
     return render_template('index.html')
 
 @app.route('/channel/<channel>')
 def channel_modules(channel):
     if channel in config.CHANNELS:
         channel_name = config.CHANNELS[channel]['name']
+        logger.info(f"Пользователь выбрал канал: {channel_name} ({channel})")
         return render_template('channel_modules.html', channel=channel, channel_name=channel_name)
     else:
+        logger.warning(f"Попытка доступа к несуществующему каналу: {channel}")
         return redirect(url_for('index'))
 
 @app.route('/backremove')
 def backremove():
+    logger.info("Переход на страницу удаления фона")
     return render_template('backremove.html')
 
 @app.route('/delete_person')
 def delete_person_page():
+    logger.info("Переход на страницу удаления персоны")
     return render_template('delete_person.html')
 
 @app.route('/add_person', methods=['GET', 'POST'])
@@ -132,19 +156,33 @@ def add_person():
         position = normalize_text(request.form['position'])
         file = request.files['photo']
 
+        logger.info(f"Попытка добавления новой персоны: {fio}, должность: {position}")
+        
         if fio and position and file and services.allowed_file(file.filename):
-            filename = file.filename
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            file.save(filepath)
+            try:
+                filename = file.filename
+                filepath = os.path.join(UPLOAD_FOLDER, filename)
+                file.save(filepath)
+                file_logger.info(f"Файл сохранен: {filepath}")
 
-            proxy_filename = f'proxy_{filename}'
-            proxy_filepath = os.path.join(PROXY_FOLDER, proxy_filename)
-            services.convert_for_avatar(filepath, proxy_filepath)
-            db.db_add_new_person(fio, position, filepath, proxy_filepath)
-            
-            # Дублируем файлы в другой канал
-            duplicate_to_other_channel(filepath)
-            duplicate_to_other_channel(proxy_filepath)
+                proxy_filename = f'proxy_{filename}'
+                proxy_filepath = os.path.join(PROXY_FOLDER, proxy_filename)
+                services.convert_for_avatar(filepath, proxy_filepath)
+                file_logger.info(f"Создан аватар: {proxy_filepath}")
+                
+                db.db_add_new_person(fio, position, filepath, proxy_filepath)
+                db_logger.info(f"Персона добавлена в БД: {fio} ({position})")
+                
+                # Дублируем файлы в другой канал
+                duplicate_to_other_channel(filepath)
+                duplicate_to_other_channel(proxy_filepath)
+                
+                logger.info(f"Персона успешно добавлена: {fio}")
+            except Exception as e:
+                logger.error(f"Ошибка при добавлении персоны {fio}: {e}")
+                return f"Ошибка добавления данных: {e}"
+        else:
+            logger.warning(f"Некорректные данные при добавлении персоны: ФИО={fio}, Должность={position}, Файл={file.filename if file else 'отсутствует'}")
             
         return redirect(url_for('index'))
     else:
@@ -154,25 +192,40 @@ def add_person():
 @app.route('/<channel>/1win_v1', methods=['GET', 'POST'])
 def module_1win_v1(channel):
     if channel not in config.CHANNELS:
+        logger.warning(f"Попытка доступа к модулю 1win_v1 с некорректным каналом: {channel}")
         return redirect(url_for('index'))
         
+    channel_name = config.CHANNELS[channel]['name']
+    logger.info(f"Доступ к модулю 1win_v1 для канала {channel_name}")
+    
     module_name = '1win_v1'
     if request.method == 'POST':
-        for i in range(1, 2):
-            fio = normalize_text(request.form[f'fio{i}'])
-            position = normalize_text(request.form[f'position{i}'])
-            filepath = request.form[f'photo_path{i}']
-            proxy_filepath = request.form[f'proxy_path{i}']
+        logger.info(f"Обновление данных в модуле {module_name} для канала {channel_name}")
+        try:
+            for i in range(1, 2):
+                fio = normalize_text(request.form[f'fio{i}'])
+                position = normalize_text(request.form[f'position{i}'])
+                filepath = request.form[f'photo_path{i}']
+                proxy_filepath = request.form[f'proxy_path{i}']
 
-            if fio and position and filepath and proxy_filepath:
-                services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
+                if fio and position and filepath and proxy_filepath:
+                    services.update_excel(module_name, fio, position, filepath, proxy_filepath, i, channel)
+                    logger.info(f"Данные обновлены в Excel для {channel_name}: {fio} ({position})")
+        except Exception as e:
+            logger.error(f"Ошибка при обновлении данных в модуле {module_name} для канала {channel}: {e}")
+            
     # Чтение данных из Excel
-    excel_file = config.CHANNELS[channel]['excel']
-    df = pd.read_excel(excel_file)
-    # Нормализуем данные из Excel
-    df = normalize_excel_data(df)
-    data = df.to_dict('list')
-    channel_name = config.CHANNELS[channel]['name']
+    try:
+        excel_file = config.CHANNELS[channel]['excel']
+        df = pd.read_excel(excel_file)
+        # Нормализуем данные из Excel
+        df = normalize_excel_data(df)
+        data = df.to_dict('list')
+        logger.debug(f"Данные успешно загружены из Excel для канала {channel_name}")
+    except Exception as e:
+        logger.error(f"Ошибка при чтении Excel-файла для канала {channel}: {e}")
+        data = {}
+        
     return render_template('1win_v1.html', data=data, module_name=module_name, channel=channel, channel_name=channel_name)
 
 
@@ -377,26 +430,39 @@ def module_3win_v3(channel):
 
 @app.route('/get_people')
 def get_people():
-    conn = sqlite3.connect('avid.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, fio, position, photo, avatar FROM virt ORDER BY fio COLLATE NOCASE")
-    people = cursor.fetchall()
-    conn.close()
-    return jsonify([{'id': person[0], 'fio': person[1], 'position': person[2], 'photo_path': person[3], 'proxy_path': person[4]} for person in people])
+    logger.info("Запрос списка всех персон из базы данных")
+    try:
+        conn = sqlite3.connect('avid.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, fio, position, photo, avatar FROM virt ORDER BY fio COLLATE NOCASE")
+        people = cursor.fetchall()
+        conn.close()
+        
+        logger.info(f"Получено {len(people)} персон из базы данных")
+        return jsonify([{'id': person[0], 'fio': person[1], 'position': person[2], 'photo_path': person[3], 'proxy_path': person[4]} for person in people])
+    except Exception as e:
+        logger.error(f"Ошибка при получении списка персон: {e}")
+        return jsonify([])  # Возвращаем пустой список в случае ошибки
 
 
 @app.route('/save_image', methods=['POST'])
 def save_image():
+    logger.info("Начало обработки сохранения изображения с удаленным фоном")
+    
     # Проверяем, есть ли данные изображения в запросе
     if 'image' not in request.json:
-        # Если нет, возвращаем ошибку
+        logger.error("Отсутствуют данные изображения в запросе")
         return jsonify({'success': False, 'error': 'No image data'}), 400
+        
     # Декодируем данные изображения из base64
     image_data = base64.b64decode(request.json['image'].split(',')[1])
     # Получаем имя из данных запроса и нормализуем
     name = normalize_text(request.json['name'])
     # Получаем должность из данных запроса и нормализуем
     position = normalize_text(request.json['position'])
+    
+    logger.info(f"Обработка изображения для: {name} ({position})")
+    
     # Создаем объект изображения из полученных данных
     img = Image.open(io.BytesIO(image_data))
     
@@ -408,10 +474,14 @@ def save_image():
             # Получаем путь к временному файлу
             temp_file_path = temp_file.name
         
+        logger.debug(f"Временный файл создан: {temp_file_path}")
+        
         # Открываем изображение и напрямую применяем функцию process для удаления фона
         input_image = Image.open(temp_file_path).convert("RGB")
         # Используем импортированную функцию process
         output_image = process(input_image)
+        
+        logger.info("Фон успешно удален из изображения")
         
         # Сохраняем обработанное изображение во временный файл
         output_image_path = temp_file_path + "_output.png"
@@ -435,6 +505,7 @@ def save_image():
         
         # Копируем обработанное изображение в финальную папку
         shutil.copy(output_image_path, final_file_path)
+        file_logger.info(f"Изображение сохранено: {final_file_path}")
         
         # Дублируем файл в другой канал
         duplicate_to_other_channel(final_file_path)
@@ -443,9 +514,11 @@ def save_image():
         os.remove(temp_file_path)
         os.remove(output_image_path)
         
+        logger.info(f"Изображение успешно обработано и сохранено для {name}")
         # Возвращаем успешный ответ с путем к сохраненному файлу
         return jsonify({'success': True, 'file_path': final_file_path})
     except Exception as e:
+        logger.error(f"Ошибка при обработке изображения для {name}: {e}")
         # В случае ошибки возвращаем информацию об ошибке
         return jsonify({'success': False, 'error': str(e)}), 500
     finally:
@@ -470,6 +543,10 @@ def delete_image():
     file_path = data.get('file_path')
     comment = data.get('comment', '')
 
+    logger.info(f"Запрос на удаление изображения: {file_path}")
+    if comment:
+        logger.info(f"Комментарий к удалению: {comment}")
+
     try:
         if os.path.exists(file_path):
             # Создаем директорию DELETED, если она не существует
@@ -477,7 +554,10 @@ def delete_image():
             channel = 'rentv'  # по умолчанию РЕН ТВ
             if '5TV' in file_path:
                 channel = '5tv'
-                
+
+            channel_name = config.CHANNELS[channel]['name']
+            logger.info(f"Удаление файла из канала {channel_name}")
+
             deleted_path = config.get_channel_path('deleted', channel)
             if not os.path.exists(deleted_path):
                 os.makedirs(deleted_path)
@@ -494,9 +574,11 @@ def delete_image():
             
             # Перемещаем файл в папку DELETED
             shutil.move(file_path, deleted_file_path)
+            file_logger.info(f"Файл перемещен в DELETED: {file_path} -> {deleted_file_path}")
             
             # Ищем и удаляем такой же файл из другого канала
             other_channel = 'rentv' if channel == '5tv' else '5tv'
+            other_channel_name = config.CHANNELS[other_channel]['name']
             other_channel_path = config.get_channel_path('upload', other_channel)
             other_channel_file = os.path.join(other_channel_path, base_filename)
             
@@ -524,16 +606,15 @@ def delete_image():
                 
                 # Перемещаем файл из другого канала
                 shutil.move(other_channel_file, other_deleted_file_path)
-                print(f"Файл из другого канала перемещен в DELETED: {other_deleted_file_path}")
+                file_logger.info(f"Файл из канала {other_channel_name} также перемещен в DELETED: {other_deleted_file_path}")
             
-            message = f"Фото перемещено в DELETED: {deleted_file_path}"
-            if comment:
-                message += f" Комментарий: {comment}"
-            print(message)
+            logger.info(f"Изображение успешно удалено: {base_filename}")
             return jsonify({'success': True})
         else:
+            logger.error(f"Файл для удаления не найден: {file_path}")
             return jsonify({'success': False, 'error': 'Файл не найден'}), 404
     except Exception as e:
+        logger.error(f"Ошибка при удалении изображения {file_path}: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # Определяем маршрут для получения изображения
@@ -553,8 +634,12 @@ def continue_processing():
     name = normalize_text(data.get('name'))
     position = normalize_text(data.get('position'))
 
+    logger.info(f"Продолжение обработки: добавление в БД персоны {name} ({position})")
+    logger.info(f"Файл для обработки: {file_path}")
+
     try:
         if not os.path.exists(file_path):
+            logger.error(f"Файл не найден для continue_processing: {file_path}")
             return jsonify({'success': False, 'error': 'Файл не найден'}), 404
 
         avatars_path = PROXY_FOLDER
@@ -563,15 +648,24 @@ def continue_processing():
 
         avatar_filename = os.path.basename(file_path)
         avatar_path = os.path.join(avatars_path, avatar_filename)
+        
+        logger.info(f"Создание аватара: {avatar_path}")
         services.convert_for_avatar(file_path, avatar_path)
+        file_logger.info(f"Аватар создан: {avatar_path}")
+        
+        logger.info(f"Добавление в базу данных: {name} ({position})")
         db.db_add_new_person(name, position, file_path=file_path, proxy_path=avatar_path)
+        db_logger.info(f"Персона добавлена в БД через continue_processing: {name} ({position})")
         
         # Дублируем файлы в другой канал
+        logger.info("Начинаем дублирование файлов в другой канал")
         duplicate_to_other_channel(file_path)
         duplicate_to_other_channel(avatar_path)
 
+        logger.info(f"Персона {name} успешно добавлена в систему через continue_processing")
         return jsonify({'success': True, 'avatar_path': avatar_path})
     except Exception as e:
+        logger.error(f"Ошибка в continue_processing для {name}: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/delete_person', methods=['POST'])
@@ -580,63 +674,118 @@ def delete_person():
     person_id = data.get('id')
     
     if not person_id:
+        logger.error("Попытка удаления персоны без указания ID")
         return jsonify({'success': False, 'error': 'ID не указан'}), 400
+    
+    logger.info(f"Запрос на удаление персоны с ID: {person_id}")
     
     try:
         # Получаем информацию о человеке перед удалением
         conn = sqlite3.connect('avid.db')
         cursor = conn.cursor()
-        cursor.execute("SELECT photo, avatar FROM virt WHERE id = ?", (person_id,))
+        cursor.execute("SELECT fio, position, photo, avatar FROM virt WHERE id = ?", (person_id,))
         result = cursor.fetchone()
         
         if not result:
+            logger.error(f"Персона с ID {person_id} не найдена в базе данных")
             return jsonify({'success': False, 'error': 'Человек не найден'}), 404
             
-        photo_path, avatar_path = result
+        fio, position, photo_path, avatar_path = result
+        logger.info(f"Удаление персоны: {fio} ({position})")
         
-        # Удаляем файлы, если они существуют
-        if photo_path and os.path.exists(photo_path):
-            try:
-                os.remove(photo_path)
-            except:
-                pass
+        # Функция для удаления файла из обеих папок каналов
+        def delete_from_both_channels(file_path):
+            if not file_path or not os.path.exists(file_path):
+                return
                 
-        if avatar_path and os.path.exists(avatar_path):
             try:
-                os.remove(avatar_path)
-            except:
-                pass
+                # Удаляем основной файл
+                os.remove(file_path)
+                file_logger.info(f"Удален файл: {file_path}")
+                
+                # Получаем имя файла
+                filename = os.path.basename(file_path)
+                file_dir = os.path.dirname(file_path)
+                
+                # Определяем канал и тип файла
+                channel = 'rentv'  # по умолчанию
+                file_type = 'upload'
+                
+                if '5TV' in file_dir:
+                    channel = '5tv'
+                
+                if 'AVATARS' in file_dir or 'proxy_' in filename:
+                    file_type = 'proxy'
+                elif 'DELETED' in file_dir:
+                    file_type = 'deleted'
+                
+                # Определяем другой канал
+                other_channel = 'rentv' if channel == '5tv' else '5tv'
+                
+                # Ищем файл в директории другого канала
+                other_channel_path = config.get_channel_path(file_type, other_channel)
+                other_channel_file = os.path.join(other_channel_path, filename)
+                
+                # Удаляем файл из другого канала, если он существует
+                if os.path.exists(other_channel_file):
+                    os.remove(other_channel_file)
+                    file_logger.info(f"Удален файл из другого канала: {other_channel_file}")
+                    
+            except Exception as e:
+                logger.error(f"Ошибка при удалении файла {file_path}: {e}")
+        
+        # Удаляем основное фото из обеих папок каналов
+        delete_from_both_channels(photo_path)
+        
+        # Удаляем аватар из обеих папок каналов  
+        delete_from_both_channels(avatar_path)
         
         # Удаляем запись из БД
         cursor.execute("DELETE FROM virt WHERE id = ?", (person_id,))
         conn.commit()
         conn.close()
         
+        db_logger.info(f"Персона удалена из БД: {fio} (ID: {person_id})")
+        logger.info(f"Персона успешно удалена: {fio}")
+        
         return jsonify({'success': True})
     except Exception as e:
+        logger.error(f"Ошибка при удалении персоны с ID {person_id}: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
-    db.db_connect()
-    # Создаем Excel-файлы для обоих каналов, если они не существуют
-    services.create_excel()
+    logger.info("=== ЗАПУСК ПРИЛОЖЕНИЯ VIRTUALSTUDIO ===")
     
-    # Создаем директории для РЕН-ТВ, если они не существуют
-    rentv_dirs = [
-        config.UPLOAD_FOLDER,
-        config.PROXY_FOLDER,
-        config.BACKREMOVE_DELETED_PATH
-    ]
-    
-    for path in rentv_dirs:
-        if not os.path.exists(path):
-            os.makedirs(path, exist_ok=True)
-            print(f"Создана директория для РЕН-ТВ: {path}")
-    
-    # Создаем директории для Пятого канала из CHANNEL_DIRS
-    for path in config.CHANNEL_DIRS['5TV']:
-        if not os.path.exists(path):
-            os.makedirs(path, exist_ok=True)
-            print(f"Создана директория для Пятого канала: {path}")
-    
-    app.run(debug=True, port=5700)
+    try:
+        db.db_connect()
+        db_logger.info("Подключение к базе данных установлено")
+        
+        # Создаем Excel-файлы для обоих каналов, если они не существуют
+        services.create_excel()
+        logger.info("Excel-файлы для каналов инициализированы")
+        
+        # Создаем директории для РЕН-ТВ, если они не существуют
+        rentv_dirs = [
+            config.UPLOAD_FOLDER,
+            config.PROXY_FOLDER,
+            config.BACKREMOVE_DELETED_PATH
+        ]
+        
+        for path in rentv_dirs:
+            if not os.path.exists(path):
+                os.makedirs(path, exist_ok=True)
+                logger.info(f"Создана директория для РЕН-ТВ: {path}")
+        
+        # Создаем директории для Пятого канала из CHANNEL_DIRS
+        for path in config.CHANNEL_DIRS['5TV']:
+            if not os.path.exists(path):
+                os.makedirs(path, exist_ok=True)
+                logger.info(f"Создана директория для Пятого канала: {path}")
+        
+        logger.info("Все директории созданы и готовы к работе")
+        logger.info("Запуск Flask сервера на порту 5700...")
+        
+        app.run(debug=True, port=5700)
+    except Exception as e:
+        logger.error(f"Критическая ошибка при запуске приложения: {e}")
+        raise
